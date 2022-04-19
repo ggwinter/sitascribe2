@@ -3,5 +3,3 @@
 .Rdata
 .httr-oauth
 .DS_Store
-^devtools_history\.R$
-^devtools_importfrom\.R$
