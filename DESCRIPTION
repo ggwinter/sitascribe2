@@ -1,0 +1,37 @@
+Package: sitascribe2
+Title: Realisation de la plaquette trimestrielle sitadel dr plus
+Version: 0.3.0
+Authors@R: 
+    person("Georges", "Winterstein", , "Georges.Winterstein@developpement-durable.gouv.fr", role = c("aut", "cre"))
+Description: Realisation de la plaquette trimestrielle sitadel dr plus a partir du tableau excel.
+License: GPL-3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Imports: 
+    attempt,
+    cli,
+    COGiter,
+    dplyr,
+    ggplot2,
+    here,
+    janitor,
+    lubridate,
+    magrittr,
+    purrr,
+    RcppRoll,
+    readxl,
+    rvest,
+    scales,
+    sf,
+    stats,
+    stringr,
+    tibble,
+    tidyr,
+    usethis,
+    utf8,
+    utils,
+    xml2
+Depends: 
+    R (>= 2.10)
+LazyData: true

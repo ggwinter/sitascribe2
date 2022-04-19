@@ -1,0 +1,4 @@
+name: plaquette_drplus
+description: >
+   Script qui va transformer le tableau en entree en plaquette
+create_dir: FALSE

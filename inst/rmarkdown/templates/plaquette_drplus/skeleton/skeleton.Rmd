@@ -1,0 +1,154 @@
+---
+title: "Test plaquette sitadel"
+author: "G.Winterstein"
+date: "2022-04-11"
+params: 
+  annee_mois: "202202"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(sitascribe2)
+```
+
+## Entrees (data)
+
+### Creer les repertoires et sous-repertoires
+
+```{r repertoires}
+fn01_cree_repertoires()
+```
+
+### Verifie si le mois est valide
+
+Le mois dans params (parametres) doit correspondre avec un tableau du ROeS dans 2_data
+
+```{r test_date}
+fn02_verifie_mois_valide()
+```
+
+### Lit le fichier excel
+
+-   lsm liste des onglets du tableau excel donnees brutes
+
+```{r data_raw}
+fn03_lit_tab_excel()-> lsm 
+
+```
+
+#### Cumul sur 12 mois arrondi ou pas
+
+-   lsm_12m0 donnees cumulees sur 12 mois non arrondies (calcul des taux d evolution)
+
+-   lsm_12m donnees cumulees sur 12 mois arrondies et recalees (affichage dans les tableaux)
+
+```{r data_mod}
+fn04_modifie1_liste(lsm)-> lsm_12m0
+fn05_modifie2_liste(lsm_12m0)-> lsm_12m
+```
+
+## Sorties (tableaux, illustrations)
+
+### Graphique tous les logements par mois (non publiable)
+
+Donne une idee des volumes concernés a comparer avec le taux de remontee des informations si besoin (voir Joseph)
+
+```{r graph0}
+purrr::map(c("aut", "com"), ~fn06_graphe_mensuel_np(.x))-> ls_graph
+ls_graph
+```
+
+### Graphique évolution par type tous les logements
+
+```{r graph1}
+purrr::map(c("aut", "com"), ~fn07_graphe_lgt_type_evol(.x))-> ls_graph1
+ls_graph1
+```
+
+### Tableau Bilan (doc travail)
+
+```{r tab_travail}
+fn08_tableau_bilan()-> bilan
+```
+
+### Tableau plaquette 1
+
+```{r tab1}
+purrr::map(c("aut", "com"), ~fn09_tableau_lgt_tous_territoire(.x))-> ls_tab1
+ls_tab1
+```
+
+### Tableaux plaquette 2
+
+```{r tab2}
+purrr::map(c("aut", "com"), ~fn10_tableau_lgt_type(.x))-> ls_tab2
+ls_tab2
+```
+
+### Graphique part de chaque type de logements
+
+```{r graph2}
+purrr::map(c("aut", "com"), ~fn11_graphe_barres_lgt_type_territoire(.x))-> ls_graph2
+ls_graph2
+```
+
+### Graphique comparaison en base 100 Corse et France metropolitaine
+
+```{r graph3}
+purrr::map(c("aut", "com"), ~fn12_graphe_lgt_tous_base100(.x))-> ls_graph3
+ls_graph3
+```
+
+### Graphique comparaison des deux departements corses
+
+```{r graph4}
+fn13_graphe_lgt_tous_autcom_dep()-> graph4
+graph4
+```
+
+### Cartographie
+
+```{r carto}
+purrr::map(c("aut", "com"), ~fn14_carte_region_lgt_tous_evolution(.x))-> ls_carte1
+ls_carte1
+```
+
+### Export data pour serveur
+
+```{r tab_serveur}
+purrr::walk(c("aut", "com"), ~fn15_enregistre_tab_4serveur(.x))
+
+```
+
+### Recapitulatif tableaux plaquette
+
+```{r }
+ls_tab <- list("tab1" = ls_tab1[[1]],
+                  "tab2" = ls_tab2[[1]],
+                  "tab3" = ls_tab1[[2]],
+                  "tab4" = ls_tab2[[2]]
+                  )
+
+```
+
+## La plaquette
+
+### lit le modele de plaquette
+
+```{r lit_modele}
+fn16_lit_le_modele_sla()-> ls_modele
+```
+
+### Actualise son contenu
+
+```{r actualise_modele}
+fn17_modifie_objet_by_id_newvalue()
+fn18_tableaux_cellule_a_remplacer()-> toto
+fn19_tableaux_remplace_corps_tableau()
+fn20_actualise_date_titre(x = params$annee_mois)
+fn21_tableaux_met_en_forme_2ndeligne()
+
+```
+
+
