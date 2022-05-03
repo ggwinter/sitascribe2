@@ -130,7 +130,7 @@ fn14_carte_region_lgt_tous_evolution <- function(x = "aut") {
         color = "transparent",
         size = 2
       ),
-      legend.position = c(0.92, 0.50),
+      legend.position = c(0.92, 0.60),
       # legend.justification = c(1.2, 0),
       legend.key.size = grid::unit(0.4, "cm")
     )
