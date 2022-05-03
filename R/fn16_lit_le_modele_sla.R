@@ -74,7 +74,7 @@ fn16_lit_le_modele_sla <- function(x = 'txt_plaquette') {
       "new_value" = dplyr::case_when(
         stringr::str_detect(nom_objet, "image|logo|qrcode") ~ stringr::str_replace(PFILE, "../4_resultats", ".."),
         stringr::str_detect(nom_objet, "graphe|carte") ~
-          stringr::str_replace(PFILE, paste0("../4_resultats/", params$annee_mois), ".")
+          stringr::str_replace(PFILE, paste0("../4_resultats/202202"), ".")
       ),
       "attr" = "PFILE"
     ) %>% dplyr::arrange(nom_objet) -> t_images
