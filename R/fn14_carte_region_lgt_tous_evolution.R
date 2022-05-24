@@ -136,7 +136,8 @@ fn14_carte_region_lgt_tous_evolution <- function(x = "aut") {
     )
 
 
-  p + ggplot2::geom_sf_text(ggplot2::aes(label = round(diff * 100, 2)), size = 5) +
+  p + ggplot2::geom_sf_text(ggplot2::aes(label = round(diff * 100, 2) %>%
+                                           format(., decimal.mark = ",")), size = 5) +
     ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(size = 5), reverse = TRUE))-> p
   p
 
