@@ -137,8 +137,9 @@ fn14_carte_region_lgt_tous_evolution <- function(x = "aut") {
 
 
   p + ggplot2::geom_sf_text(ggplot2::aes(label = round(diff * 100, 2) %>%
-                                           format(., decimal.mark = ",")), size = 5) +
-    ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(size = 5), reverse = TRUE))-> p
+                                           format(., decimal.mark=",")), size = 3.6) +
+    ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(size = 4, colour = "transparent", lwd = 0),
+                                                 reverse = TRUE)) -> p
   p
 
   filename <-here::here("4_resultats", params$annee_mois, "images", paste0("reg_log_12m_chiffres_", x, ".png"))

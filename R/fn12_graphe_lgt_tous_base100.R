@@ -91,6 +91,9 @@ fn12_graphe_lgt_tous_base100 <- function(x = "aut"){
   graduation <-
     b100_frmcor$Mois[seq(1, nrow(b100_frmcor) / 2, 6)]
 
+  as.integer(ls_dates$liste_mois[1])-1000-> eff
+  paste0("(", paste(substr(eff, 1, 4), substr(eff, 5, 6), sep ="-"), ")")-> eff
+
   p <- ggplot2::ggplot(
     b100_frmcor,
     ggplot2::aes(x = Mois, y = b100_log, group = territoire)
@@ -101,7 +104,7 @@ fn12_graphe_lgt_tous_base100 <- function(x = "aut"){
     ggplot2::scale_linetype_manual(values = c("twodash", "solid")) +
     ggplot2::scale_x_date(labels = scales::date_format("%Y-%m"), breaks = graduation) +
     ggplot2::scale_y_continuous(
-      name = "valeur en base 100",
+      name = paste0("valeur en base 100 :\n", eff),
       limits = val_range,
       breaks = seq(val_range[1], val_range[2], 20)
     ) +
