@@ -32,10 +32,10 @@ fn15_enregistre_tab_4serveur <- function(x = "aut") {
         "territoire",
         "annee",
         "date",
-        "log",
-        "ip",
-        "ig",
-        "colres"
+        paste0("log_", toupper(x)),
+        paste0("ip_", toupper(x)),
+        paste0("ig_", toupper(x)),
+        paste0("colres_", toupper(x))
       )
     ) -> sit_drp_corse
 
@@ -49,7 +49,19 @@ fn15_enregistre_tab_4serveur <- function(x = "aut") {
     dplyr::ungroup() %>%
     dplyr::select(-geo, -type) %>%
     dplyr::mutate(annee = stringr::str_sub(date, 1, 4)) %>%
-    dplyr::select(terr_cd, territoire, annee, date, log:colres) -> sit_drp_dptcorse
+    dplyr::select(terr_cd, territoire, annee, date, log:colres)  %>%
+    purrr::set_names(
+      c(
+        "terr_cd",
+        "territoire",
+        "annee",
+        "date",
+        paste0("log_", toupper(x)),
+        paste0("ip_", toupper(x)),
+        paste0("ig_", toupper(x)),
+        paste0("colres_", toupper(x))
+      )
+    )-> sit_drp_dptcorse
 
   utils::write.csv2(
     sit_drp_dptcorse,
