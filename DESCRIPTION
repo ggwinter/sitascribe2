@@ -1,6 +1,6 @@
 Package: sitascribe2
 Title: Realisation de la plaquette trimestrielle sitadel dr plus
-Version: 0.4.0
+Version: 0.5.0
 Authors@R: 
     person("Georges", "Winterstein", , "Georges.Winterstein@developpement-durable.gouv.fr", role = c("aut", "cre"))
 Description: Realisation de la plaquette trimestrielle sitadel dr plus a partir du tableau excel.
