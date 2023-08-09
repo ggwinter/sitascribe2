@@ -1,0 +1,168 @@
+---
+title: "Utiliser_sitascribe2"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Utiliser_sitascribe2}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(sitascribe2)
+```
+
+## A quoi sert sitascribe2
+
+A partir du tableau excel mensuel des logements autorises et commences
+le script va realiser une analyse qui va produire :
+
+-   un rapport en html
+
+-   des tableaux recapitulatifs
+
+-   des graphiques
+
+-   des cartes
+
+-   ces elements vont in fine alimenter un fichier scribus et permettre
+    la realisation d une publication au format pdf
+
+## Mode operatoire
+
+### Telecharger Sitascribe2
+
+remotes::install_github("ggwinter/sitascribe2", build_vignettes = TRUE)
+
+### le script necessite les packages suivants pour fonctionner
+
+```         
+attempt,
+cli,
+COGiter,
+dplyr,
+ggplot2,
+here,
+janitor,
+lubridate,
+magrittr,
+purrr,
+RcppRoll,
+readxl,
+rvest,
+scales,
+sf,
+stats,
+stringr,
+tibble,
+tidyr,
+usethis,
+utf8,
+utils,
+xml2
+```
+
+### Creer un nouveau projet si ce n'est pas déjà fait
+
+En haut a droite du bouton bleu cliquer sur le triangle New Project soit
+nouveau repertoire soit repertoire existant, lui donner un nom ex
+*Sitadel*
+
+### Travailler dans le projet
+
+Le nouveau projet s ouvre. Dans la console à gauche taper
+library(sitascribe2) ou en bas à droite cliquer sur packages et cliquer
+la case a cocher devant sitascribe2
+
+En haut à gauche dans le menu File cliquer sur New file puis sur
+RMarkdown
+
+Dans la fenetre qui s ouvre cliquer dans la partie gauche sur From
+Template puis selectionner plaquette_drplus (sitascribe2)
+
+Un fichier qui s'appelle Untitled1 s ouvre, l enregistrer (disquette en
+haut à gauche sous le nom du fichier) par exemple
+*plaquette_sitadel.Rmd*
+
+### Lancer l analyse
+
+Modifier la date : annee+mois Laisser modele_plaquette sur non
+
+Dans la fenetre en haut à gauche, chaque partie de code en surbrillance
+est appelle un chunk, il contient des instructions qui se lancent en
+cliquant sur le petit triangle vert en haut à droite de chaque chunk.
+
+on va lancer chaque chunk dans l ordre et regarder si il y a des erreurs
+
+le premier chunk est ok
+
+le second est ok
+
+le 3eme qui cree les repertoires est ok
+
+le 4eme verifie si dans le repertoire 2_data/annee+mois il existe bien
+un fichier xlsx pour ce mois là, si ce n est pas le cas il envoit un
+message d erreur placer le fichier dans le repertoire et recommencer
+
+Par la suite il est plus facile de creer chaque fois un repertoire dans
+2_data au format 202205, y placer le fichier xls puis de lancer le
+script en cliquant sur knit bouton bleu en haut au dessus du fichier
+*plaquette_sitadel.Rmd* .
+
+Si tout a bien fonctionne, un fichier html apparait a l ecran et tous
+les fichiers en sortie sont dans le sous-reperoire 4_resultats :
+tableaux carte et graphiques.
+
+### Realiser la plaquette
+
+La plaquette necessite l installation sur le poste du logiciel de PAO
+scribus en version 1.5.8 de preference.
+
+[Scribus](https://scribus.fr/)
+
+Dans 4 resultat selectionner le fichier en .sla, double cliquer dessus
+il va s'ouvrir dans Scribus et la plaquette apparait.
+
+### Reutiliser une plaquette pour modifier le modele
+
+Apres avoir creer la plaquette, il peut y avoir des modifications
+manuelles a apporter comme le nom des responsables qui a change. Il est
+possible d integrer ces modifications dans les plaquettes suivantes.
+
+Pour cela il faut :
+
+-   Enregistrer la plaquette modifiee dans scribus dans le repertoire
+    3_tables et l appeller **obligatoirement** modele_sitadel.sla
+
+-   dans le fichier *plaquette_sitadel.Rmd* en haut dans les paramètres
+    preciser modele_plaquette: "oui"
+
+-   Relancer le fichier modele_sitadel.sla en cliquant sur knit bouton
+    bleu en haut au dessus du fichier *plaquette_sitadel.Rmd* .
+
+-   Les modifications ont ete prises en compte et la plaquette dans
+    4_resultats modifiee
+
+## Pour aller plus loin
+
+### Differences avec RMarkdown
+
+RMarkdown va realiser automatiquement un document d apres les elements
+calcules par le script R. Le rendu en html puis pdf est simpliste et ne
+convient pas a la realisation d une plaquette de ce type. Ce point peut
+etre ameliore en passant par le package pagedown ou via Latex.
+
+sitascribe2 ne realise pas un document mais se contente de modifier le
+contenu d un modele de document qui a ete realise prealablement sous le
+logiciel de PAO Scribus. Il s agit en l'etat d'une demonstration de
+faisabilite de l'utilisation conjointe et interoperable des logiciels R
+et Scribus dans un workflow.

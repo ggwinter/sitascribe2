@@ -4,7 +4,7 @@ author: "G.Winterstein"
 date: "2022-04-11"
 params: 
   annee_mois: "202202"
-  modele_plaquette: "oui"
+  modele_plaquette: "non"
 output: html_document
 ---
 
@@ -19,7 +19,8 @@ Depuis Scribus ou l'explorateur dde fichier : Enregistrer une plaquette modifié
 
 ```{r}
 stopifnot(params$modele_plaquette %in% c("oui", "non"))
-if(params$modele_plaquette == "oui"){"./3_tables/modele_sitadel.sla" -> chem_plaquette}
+if(params$modele_plaquette == "oui"){stopifnot(file.exists("./3_tables/modele_sitadel.sla"))
+  "./3_tables/modele_sitadel.sla" -> chem_plaquette}
 ```
 
 ## Entrees (data)
