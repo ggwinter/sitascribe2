@@ -1,4 +1,4 @@
-#' utilitaire_importFrom
+#' x_utilitaire_importFrom
 #'
 #' utile pour lister les fonctions externes utilisees par chaque fonction
 #'

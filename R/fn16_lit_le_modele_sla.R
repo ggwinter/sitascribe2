@@ -13,194 +13,163 @@
 #' @importFrom dplyr inner_join
 #' @importFrom dplyr left_join
 #' @importFrom dplyr mutate
-#' @importFrom dplyr pull
 #' @importFrom dplyr rename
-#' @importFrom dplyr select
 #' @importFrom dplyr tibble
 #' @importFrom here here
-#' @importFrom purrr map
-#' @importFrom purrr map_chr
+#' @importFrom purrr map_dbl
 #' @importFrom purrr map_dfr
-#' @importFrom purrr map2
 #' @importFrom purrr map2_dfr
 #' @importFrom purrr set_names
-#' @importFrom purrr walk
 #' @importFrom purrr walk2
 #' @importFrom rvest html_element
-#' @importFrom stringr str_detect
-#' @importFrom stringr str_extract
-#' @importFrom stringr str_replace
-#' @importFrom stringr str_which
-#' @importFrom stats na.omit
+#' @importFrom stringr str_pad
+#' @importFrom stringr str_replace_all
 #' @importFrom xml2 read_xml
 #' @importFrom xml2 xml_add_child
 #' @importFrom xml2 xml_attr
 #' @importFrom xml2 xml_attrs
-#' @importFrom xml2 xml_child
-#' @importFrom xml2 xml_children
 #' @importFrom xml2 xml_find_all
-#' @importFrom xml2 xml_remove
 #' @export
 fn16_lit_le_modele_sla <- function(x = 'txt_plaquette') {
-  # Lecture du texte avant modification de la plaquette
+  ifelse(
+    test = params$modele_plaquette == "oui",
+    yes = pg <-
+      xml2::read_xml(chem_plaquette, encoding = "UTF-8"),
+    no = pg <-
+      xml2::read_xml(plaquette_sitadel, encoding = "UTF-8")
+  )
 
-  # library(magrittr)
-  # txt_plaquette <-
-  #   here::here("3_tables", "P_SCIL_SITADEL_2022trim1_t01.sla")
+  # On cherche tous les PAGEOBJECT objets dans la page
+  eff <-
+    pg %>% xml2::xml_find_all(".//PAGEOBJECT") %>% xml2::xml_attrs()
+  eff |> purrr::set_names(paste0("O_", stringr::str_pad(string = seq_along(eff), side = "left", width = 2, pad = "0")))-> eff
 
 
-  xml2::read_xml(plaquette_sitadel, encoding = 'UTF-8') -> pg
+  # Chaque objet est défini par son nom et un identifiant unique cree par Scribus
+  # le PTYPE inclut le type d'objet tableau, image importée, texte
+  # on y affecte un nouvel num_objet
+  t_objets_numero <-
+    purrr::map_dfr(eff, ~ .x[c("ANNAME", "ItemID", "PTYPE")],
+                   .id = "num_objet") %>%
+    dplyr::rename(c(nom_objet = "ANNAME", id_objet = "ItemID")) %>%
+    dplyr::arrange(nom_objet) |>
+    dplyr::mutate(PTYPE_LIB = dplyr::case_when(PTYPE %in% "2"~"image",
+                                               PTYPE %in% "4"~"texte",
+                                               PTYPE %in% "16"~"tableau",
+                                               TRUE ~ "Autre"))
 
 
-  # liste des objets nommés
 
-  pg %>% xml2::xml_find_all(".//PAGEOBJECT") %>%
-    xml2::xml_attrs() -> eff
-
-  purrr::map_dfr(eff, ~ .x[c("ANNAME", "ItemID")], .id = "num_objet") %>%
-    dplyr::rename(c("nom_objet" = "ANNAME", "id_objet" = "ItemID")) %>%
-    dplyr::arrange(nom_objet) -> t_objets_numero
-
-  # les images --------
+  # On filtre toutes les images de la plaquette
+  # on extrait dans le code scribus la présence des PFILE lien vers l'image
   #
-  t_objets_numero %>%
-    dplyr::filter(stringr::str_detect(nom_objet , "image|logo|qrcode|graphe|carte")) -> t_images
-
-  purrr::map_dfr(eff[as.integer(t_images$num_objet)], ~ .x[c("ANNAME", "ItemID", "PFILE")], .id = "num_objet") %>%
-    dplyr::select(num_objet, ANNAME, ItemID, PFILE) %>%
-    dplyr::filter(stats::complete.cases(PFILE)) %>%
-    dplyr::rename(c("nom_objet" = "ANNAME", "id_objet" = "ItemID")) %>%
+  t_images <- purrr::map_dfr(eff[t_objets_numero$num_objet[t_objets_numero$PTYPE_LIB %in% "image"]], \(x) x[c("ANNAME", "ItemID", "PFILE")])|>
+    dplyr::rename(c(nom_objet = "ANNAME", id_objet = "ItemID")) %>%
     dplyr::mutate(
-      "new_value" = dplyr::case_when(
-        stringr::str_detect(nom_objet, "image|logo|qrcode") ~ stringr::str_replace(PFILE, "../4_resultats", ".."),
-        stringr::str_detect(nom_objet, "graphe|carte") ~
-          stringr::str_replace(PFILE, paste0("../4_resultats/202202"), ".")
-      ),
-      "attr" = "PFILE"
-    ) %>% dplyr::arrange(nom_objet) -> t_images
+      new_value = stringr::str_replace_all(PFILE, "../4_resultats/00_logo", "../00_logo") |>
+        stringr::str_replace_all("../4_resultats/202202", "."),
+      attr = "PFILE"
+    ) %>% dplyr::arrange(nom_objet)
+
+  # On cherche à identifier toutes les paragraphes de la plaquette
+  # sol 1 par construction le nom de l'objet doit comporter un terme generique
+  t_paragraphes <-
+    t_objets_numero %>% dplyr::filter(PTYPE_LIB %in% "texte")
+
+  # On cherche à identifier toutes les tableaux de la plaquette
+  # sol 1 par construction le nom de l'objet doit comporter un terme generique
+  t_tableaux <-
+    t_objets_numero %>% dplyr::filter(PTYPE_LIB %in% "tableau")
 
 
-  # les paragraphes ----------
+  # eff <-
+  #   pg %>% xml2::xml_find_all(".//PAGEOBJECT") %>% xml2::xml_attrs()
 
-  t_objets_numero %>%
-    dplyr::filter(stringr::str_detect(nom_objet, "_texte|_resume")) -> t_paragraphes
+  # on ajoute ala table des tableaux le nbre de cellules, de colonnes et de lignes
 
-
-
-  # Les tableaux ----------
-  #
-  #
-  # liste des objets nommés
-
-
-
-  # purrr::map_dfr(eff, ~ .x[c("ItemID", "CellAreas")], .id = "num_objet") %>%
-  #   dplyr::rename(c("nom_objet" = "ANNAME", "id_objet" = "ItemID")) -> t_objets_numero
-
-
-
-
-  t_objets_numero %>%
-    dplyr::filter(stringr::str_detect(nom_objet, "tab")) %>%
-    dplyr::arrange(num_objet) %>%
-    dplyr::mutate(num_objet = as.integer(num_objet))  %>%
-    dplyr::mutate(tab = stringr::str_extract(nom_objet, "(?<=p[:digit:][:lower:]_).*$")) %>%
-    dplyr::arrange(nom_objet) -> t_tableaux
-
-
-  # verifie les cell_areas
-  pg %>% xml2::xml_find_all(".//PAGEOBJECT") %>% xml2::xml_attrs() -> eff
-  purrr::map(eff, ~ .x[c("ItemID", "CellAreas")]) -> eff2
-  eff2[t_tableaux %>% dplyr::pull(num_objet)] -> eff2
-  # tableau existant
-
-  # ajout des infos manquantes à la table t_tableaux
-
-  fn_tableaux_infos <- function(x = "211587152") {
-    pg %>%
-      rvest::html_element(paste0("PAGEOBJECT[ItemID=\'", x, "\']")) -> ph
-
-    dplyr::tibble(
+  fn_tableaux_infos <- function(x = "203195824") {
+    ph <- pg %>% rvest::html_element(paste0("PAGEOBJECT[ItemID='", x, "']"))
+    t_tableaux_comp <- dplyr::tibble(
       id_objet = x,
-      nb_cell =  ph %>%
-        xml2::xml_find_all("TableData") %>%
-        xml2::xml_find_all("Cell") %>% length(),
-      nb_lgn = ph %>%
-        xml2::xml_attr("Rows") %>% as.integer(),
-      nb_col = ph %>%
-        xml2::xml_attr("Columns") %>% as.integer()
-    ) -> t_tableaux_comp
+      nb_cell = ph %>%
+        xml2::xml_find_all("TableData") %>% xml2::xml_find_all("Cell") %>%
+        length(),
+      nb_lgn = ph %>% xml2::xml_attr("Rows") %>%
+        as.integer(),
+      nb_col = ph %>% xml2::xml_attr("Columns") %>%
+        as.integer()
+    )
     return(t_tableaux_comp)
   }
-  purrr::map_dfr(t_tableaux$id_objet, fn_tableaux_infos) -> eff3
-  t_tableaux %>% dplyr::inner_join(eff3, by = "id_objet") -> t_tableaux
+  eff3 <- purrr::map_dfr(t_tableaux$id_objet, fn_tableaux_infos)
 
-  purrr::map2_dfr(
-    t_tableaux$id_objet,
-    t_tableaux$nb_cell,
-    ~ dplyr::tibble("id_objet" = .x,
-                    "num_cell" = 1:.y)
-  ) -> t_tableaux_cell
+  t_tableaux <-
+    t_tableaux %>% dplyr::inner_join(eff3, by = "id_objet")
 
-  fn_tableaux_lit_cell <- function(x = "211587152", y = 2) {
-    pg %>%
-      rvest::html_element(paste0("PAGEOBJECT[ItemID=\'", x, "\']")) -> ph
+  # creation d'une table avec toutes les cellules de tous les tableaux
+  # on cree un identifiant unique pour chaque cellule du tableau id_objet + num_cell
+  #
+  t_tableaux_cell <-
+    purrr::map2_dfr(
+      t_tableaux$id_objet,
+      t_tableaux$nb_cell,
+      ~ dplyr::tibble(id_objet = .x, num_cell = 1:.y)
+    )
 
-    dplyr::tibble(
-      "id_objet" = x,
-      "num_cell" = y,
-
-      "lgn" = ph %>%
-        xml2::xml_find_all("TableData") %>%
-        xml2::xml_find_all("Cell") %>% .[[y]] %>%
-        xml2::xml_attr("Row") %>% as.integer(),
-      "col" = ph %>%
-        xml2::xml_find_all("TableData") %>%
-        xml2::xml_find_all("Cell") %>% .[[y]] %>%
-        xml2::xml_attr("Column") %>% as.integer()
-    ) -> df
+  # on ajoute le numero de la ligne et de la colonne
+  # !!! attention scribus les compte a partir de 0
+  #
+  fn_tableaux_lit_cell <- function(x = "203195824", y = 2) {
+    ph <- pg %>% rvest::html_element(paste0("PAGEOBJECT[ItemID='", x, "']"))
+    df <- dplyr::tibble(
+      id_objet = x,
+      num_cell = y,
+      lgn = ph %>%
+        xml2::xml_find_all("TableData") %>% xml2::xml_find_all("Cell") %>%
+        .[[y]] %>% xml2::xml_attr("Row") %>% as.integer(),
+      col = ph %>% xml2::xml_find_all("TableData") %>%
+        xml2::xml_find_all("Cell") %>% .[[y]] %>% xml2::xml_attr("Column") %>%
+        as.integer()
+    )
     return(df)
   }
+  t_tableaux_cell <- purrr::map2_dfr(t_tableaux_cell$id_objet,
+                                     t_tableaux_cell$num_cell,
+                                     fn_tableaux_lit_cell)
 
-  purrr::map2_dfr(t_tableaux_cell$id_objet,
-                  t_tableaux_cell$num_cell,
-                  fn_tableaux_lit_cell) -> t_tableaux_cell
-
-
-  fn_tableaux_trouve_cell_vides <- function(x = "211587152") {
-    pg %>%
-      rvest::html_element(paste0("PAGEOBJECT[ItemID=\'", x, "\']")) -> ph
-    dplyr::tibble(id_objet = x,
-                  cell_vides = which(
-                    purrr::map_chr(
-                      .x = x,
-                      .f = ~ ph %>%
-                        xml2::xml_find_all("TableData") %>%
-                        xml2::xml_find_all("Cell") %>%
-                        xml2::xml_find_all("StoryText") %>%
-                        xml2::xml_find_all("ITEXT") %>% length()# on verifie pour chaque objet qu'il y a bien un Itext
-                    ) %in% "0"
-                  )) -> df
+  # On cherche les cellules vides decorations
+  # si il y en a il faut ajouter un node ITEXT dans le code SCRIBUS
+  #
+  fn_tableaux_trouve_cell_vides <- function(x = "203195824") {
+    ph <- pg %>% rvest::html_element(paste0("PAGEOBJECT[ItemID='", x, "']"))
+    df <-
+      dplyr::tibble(id_objet = x,
+                    cell_vides = which(
+                      purrr::map_dbl(
+                        .x = x,
+                        .f = ~
+                          ph %>% xml2::xml_find_all("TableData") %>%
+                          xml2::xml_find_all("Cell") %>% xml2::xml_find_all("StoryText") %>%
+                          xml2::xml_find_all("ITEXT") %>% length()
+                      ) %in% "0"
+                    ))
     return(df)
   }
-
-
-  purrr::map_dfr(t_tableaux_cell$id_objet,
-                 fn_tableaux_trouve_cell_vides) -> t_tableaux_cell_vides
+  t_tableaux_cell_vides <- purrr::map_dfr(t_tableaux_cell$id_objet,
+                                          fn_tableaux_trouve_cell_vides)
 
 
   x <- 20
   y <- 1
 
-  fn_remplie_tableau_node_itext <- function(x = "211587152", y) {
-    xml2::xml_add_child(
-      pg %>%
-        rvest::html_element(paste0("PAGEOBJECT[ItemID=\'", x, "\']")) %>%
-        xml2::xml_find_all("TableData") %>%
-        xml2::xml_find_all("Cell") %>% .[[y]] %>%
-        xml2::xml_find_all("StoryText"),
 
-      xml2::read_xml("<ITEXT CH=''/>")# complete les cellules sans itext
+  fn_remplie_tableau_node_itext <- function(x = "203195824",
+                                            y) {
+    xml2::xml_add_child(
+      pg %>% rvest::html_element(paste0("PAGEOBJECT[ItemID='",
+                                        x, "']")) %>% xml2::xml_find_all("TableData") %>%
+        xml2::xml_find_all("Cell") %>% .[[y]] %>% xml2::xml_find_all("StoryText"),
+      xml2::read_xml("<ITEXT CH=''/>")
     )
   }
   if (nrow(t_tableaux_cell_vides) > 0) {
@@ -211,48 +180,42 @@ fn16_lit_le_modele_sla <- function(x = 'txt_plaquette') {
     )
   }
 
-
-
-
-  fn_tableaux_lit_cell_txt <- function(x = "211587152", y = 2) {
-    dplyr::tibble(
-      "id_objet" = x,
-      "num_cell" = y,
-
-      "txt" = pg %>%
-        rvest::html_element(paste0("PAGEOBJECT[ItemID=\'", x, "\']")) %>%
-        xml2::xml_find_all("TableData") %>%
-        xml2::xml_find_all("Cell") %>% .[[y]] %>%
-        xml2::xml_find_all("StoryText") %>%
-        xml2::xml_find_all("ITEXT") %>%
-        xml2::xml_attr("CH"),
-
-    ) -> df
+  # On cherche le contenu de toutes les cellules
+  #
+  fn_tableaux_lit_cell_txt <- function(x = "203195824", y = 2) {
+    df <- dplyr::tibble(
+      id_objet = x,
+      num_cell = y,
+      txt = pg %>%
+        rvest::html_element(paste0("PAGEOBJECT[ItemID='",
+                                   x, "']")) %>% xml2::xml_find_all("TableData") %>%
+        xml2::xml_find_all("Cell") %>% .[[y]] %>% xml2::xml_find_all("StoryText") %>%
+        xml2::xml_find_all("ITEXT") %>% xml2::xml_attr("CH"),
+    )
     return(df)
   }
+  t_tableaux_cell_txt <- purrr::map2_dfr(t_tableaux_cell$id_objet,
+                                         t_tableaux_cell$num_cell,
+                                         fn_tableaux_lit_cell_txt)
+  t_tableaux_cell <-
+    t_tableaux_cell %>% dplyr::left_join(t_tableaux_cell_txt,
+                                         by = c("id_objet", "num_cell"))
+  t_tableaux_nb_col_lgn <-
+    t_tableaux_cell %>% dplyr::filter(!lgn %in% 0) %>%
+    dplyr::count(id_objet, name = "nbp")
+  # %>%
+  # dplyr::mutate(noms_objets2 = c("tab1", "tab2", "tab3", "tab4"))
 
-  purrr::map2_dfr(t_tableaux_cell$id_objet,
-                  t_tableaux_cell$num_cell,
-                  fn_tableaux_lit_cell_txt) -> t_tableaux_cell_txt
-
-  t_tableaux_cell %>%
-    dplyr::left_join(t_tableaux_cell_txt, by = c("id_objet", "num_cell")) -> t_tableaux_cell
-
-  # !!! a modifier lier id_objet num_tab
-  t_tableaux_cell %>% dplyr::filter(!lgn %in% 0) %>%
-    dplyr::count(id_objet, name = "nbp") %>%
-    dplyr::mutate(noms_objets2 = c("tab1", "tab2", "tab3", "tab4")) -> t_tableaux_nb_col_lgn
 
   ls_modele <- list(
-    "pg" = pg,
-    "t_objets_numero" = t_objets_numero,
-    "t_images" = t_images,
-    "t_paragraphes" = t_paragraphes,
-    "t_tableaux" = t_tableaux,
-    "t_tableaux_cell" = t_tableaux_cell,
-    "t_tableaux_nb_col_lgn" = t_tableaux_nb_col_lgn
+    pg = pg,
+    t_objets_numero = t_objets_numero,
+    t_images = t_images,
+    t_paragraphes = t_paragraphes,
+    t_tableaux = t_tableaux,
+    t_tableaux_cell = t_tableaux_cell,
+    t_tableaux_nb_col_lgn = t_tableaux_nb_col_lgn
   )
-
   return(ls_modele)
 
 }

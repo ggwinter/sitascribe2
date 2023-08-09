@@ -2,7 +2,7 @@
 % Please edit documentation in R/x_utilitaire_importFrom.R
 \name{x_utilitaire_importFrom}
 \alias{x_utilitaire_importFrom}
-\title{utilitaire_importFrom}
+\title{x_utilitaire_importFrom}
 \usage{
 x_utilitaire_importFrom(x = "fn06_met_en_forme_liste")
 }

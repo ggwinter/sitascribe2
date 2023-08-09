@@ -4,12 +4,22 @@ author: "G.Winterstein"
 date: "2022-04-11"
 params: 
   annee_mois: "202202"
+  modele_plaquette: "oui"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 library(sitascribe2)
+```
+
+## Choix du modele de plaquette si choix_plaquette : "oui"
+
+Depuis Scribus ou l'explorateur dde fichier : Enregistrer une plaquette modifiée à la main dans 3_tables en la nommant modele_sitadel.sla
+
+```{r}
+stopifnot(params$modele_plaquette %in% c("oui", "non"))
+if(params$modele_plaquette == "oui"){"./3_tables/modele_sitadel.sla" -> chem_plaquette}
 ```
 
 ## Entrees (data)
