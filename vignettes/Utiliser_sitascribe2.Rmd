@@ -37,6 +37,12 @@ le script va realiser une analyse qui va produire :
 -   ces elements vont in fine alimenter un fichier scribus et permettre
     la realisation d une publication au format pdf
 
+## pourquoi ne pas l installer
+
+Le fichier xls en entree du programme n est pas diffuse publiquement
+
+Un fichier de fake data n a pas encore ete ajoute au package
+
 ## Mode operatoire
 
 ### Telecharger Sitascribe2
