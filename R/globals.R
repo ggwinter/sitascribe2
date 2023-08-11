@@ -60,6 +60,7 @@ utils::globalVariables(
     "territoire",
     "txt_new",
     "txt_plaquette",
+    "type_lgt",
     "toto",
     "trim",
     "trim_b",
@@ -70,6 +71,7 @@ utils::globalVariables(
     "trimestre",
     "type",
     "value",
+    "valeur",
     "variable",
     "y"
   )

@@ -132,7 +132,7 @@ fn07_graphe_lgt_type_evol_area <- function(x = "aut") {
     dpi = 300
   )
 
-  rm(sdf)
+  rm(sdf, df2)
 
   return(p)
 
