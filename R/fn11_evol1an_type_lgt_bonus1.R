@@ -109,7 +109,7 @@ fn11_evol1an_type_lgt_bonus1 <- function(x = "aut") {
     dpi = 300
   )
 
-  ls_result <- list("tableau" = DT::datatable(tab3d),
+  ls_result <- list("tableau" = DT::datatable(tab3b),
                     "graphe" = p)
   return(ls_result)
 
