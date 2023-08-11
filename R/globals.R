@@ -17,6 +17,7 @@ utils::globalVariables(
     "diff_trim",
     "diff_trim1",
     "diff_trim2",
+    "evolution",
     "Evolution_FRm",
     "geo",
     "geom_wkt",

@@ -13,6 +13,7 @@ Imports:
     cli,
     COGiter,
     dplyr,
+    DT,
     ggplot2,
     here,
     janitor,

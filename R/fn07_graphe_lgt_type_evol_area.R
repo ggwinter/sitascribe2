@@ -61,7 +61,7 @@ fn07_graphe_lgt_type_evol_area <- function(x = "aut") {
                    date_min)
   date_min_an2 <-
     lubridate::ymd(paste0(lubridate::year(date_min_an), "-12-31"))
-  date_max <- max(sdf$date) + months(1) - lubridate::days(1)
+  date_max <- max(sdf$date) + months(1, abbreviate = FALSE) - lubridate::days(1)
   date_max_an <-
     lubridate::ymd(paste0(lubridate::year(date_max), "-01-01"))
   date_max_an2 <-

@@ -1,7 +1,7 @@
 ---
-title: "Test plaquette sitadel"
+title: "Plaquette Sitadel"
 author: "G.Winterstein"
-date: "2022-04-11"
+date: "2023-08-11"
 params: 
   annee_mois: "202202"
   modele_plaquette: "non"
@@ -11,16 +11,21 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 library(sitascribe2)
+type_lgt <- c("Autorisés" = "aut", "Commencés" = "com")
+```
+
+## Récapitulatif des paramètres choisis
+
+```{r choix_params}
+params
 ```
 
 ## Choix du modele de plaquette si choix_plaquette : "oui"
 
-Depuis Scribus ou l'explorateur dde fichier : Enregistrer une plaquette modifiée à la main dans 3_tables en la nommant modele_sitadel.sla
+Avant de relancer le script, depuis Scribus ou l'explorateur dde fichier : enregistrer une plaquette modifiée à la main dans 3_tables en la nommant modele_sitadel.sla
 
 ```{r}
-stopifnot(params$modele_plaquette %in% c("oui", "non"))
-if(params$modele_plaquette == "oui"){stopifnot(file.exists("./3_tables/modele_sitadel.sla"))
-  "./3_tables/modele_sitadel.sla" -> chem_plaquette}
+fn00_verifie_existe_modele()
 ```
 
 ## Entrees (data)
@@ -66,16 +71,24 @@ fn05_modifie2_liste(lsm_12m0)-> lsm_12m
 Donne une idee des volumes concernés a comparer avec le taux de remontee des informations si besoin (voir Joseph)
 
 ```{r graph0}
-purrr::map(c("aut", "com"), ~fn06_graphe_mensuel_np(.x))-> ls_graph
+purrr::map(type_lgt, ~fn06_graphe_mensuel_np(.x))-> ls_graph
 ls_graph
 ```
 
 ### Graphique évolution par type tous les logements
 
 ```{r graph1}
-purrr::map(c("aut", "com"), ~fn07_graphe_lgt_type_evol(.x))-> ls_graph1
+purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol(.x))-> ls_graph1
 ls_graph1
 ```
+
+### Graphique surfacique évolution par type tous les logements
+
+```{r graph2}
+purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol_area(.x))-> ls_graph1b
+ls_graph1b
+```
+
 
 ### Tableau Bilan (doc travail)
 
@@ -86,28 +99,96 @@ fn08_tableau_bilan()-> bilan
 ### Tableau plaquette 1
 
 ```{r tab1}
-purrr::map(c("aut", "com"), ~fn09_tableau_lgt_tous_territoire(.x))-> ls_tab1
+purrr::map(type_lgt, ~fn09_tableau_lgt_tous_territoire(.x))-> ls_tab1
 ls_tab1
 ```
 
 ### Tableaux plaquette 2
 
 ```{r tab2}
-purrr::map(c("aut", "com"), ~fn10_tableau_lgt_type(.x))-> ls_tab2
+purrr::map(type_lgt, ~fn10_tableau_lgt_type(.x))-> ls_tab2
 ls_tab2
 ```
 
 ### Graphique part de chaque type de logements
 
 ```{r graph2}
-purrr::map(c("aut", "com"), ~fn11_graphe_barres_lgt_type_territoire(.x))-> ls_graph2
+purrr::map(type_lgt, ~fn11_graphe_barres_lgt_type_territoire(.x))-> ls_graph2
 ls_graph2
 ```
+
+### Bonus1 evolution sur un an pour chaque type de logements
+
+trim : cumul de 12 mois à la date du dernier mois
+trim_b: cumul de 12 mois à la date du dernier mois - 1 an
+
+```{r bonus1}
+
+purrr::map(type_lgt, fn11_evol1an_type_lgt_bonus1)-> ls_bonus1
+```
+
+#### Logement autorisés
+
+
+```{r, fig.dim=c(10,6)}
+ls_bonus1$Autorisés$tableau
+
+ls_bonus1$Autorisés$graphe
+```
+
+
+#### Logements commencés
+
+
+```{r, fig.dim=c(10,6)}
+ls_bonus1$Commencés$tableau
+
+ls_bonus1$Commencés$graphe
+```
+
+
+
+### Bonus2 evolution sur un an pour tous les logements
+
+trim : cumul de 12 mois à la date du dernier mois
+trim_b: cumul de 12 mois à la date du dernier mois - 1 an
+
+```{r bonus2}
+
+purrr::map(type_lgt, fn11_evol1an_type_lgt_bonus2) -> ls_bonus2
+
+```
+
+
+#### Logements Autorisés
+
+
+
+```{r, fig.dim=c(10,4)}
+
+ls_bonus2$Autorisés$tableau
+
+ls_bonus2$Autorisés$graphe
+```
+
+
+
+#### Logements commencés
+
+
+
+```{r, fig.dim=c(10,4)}
+
+ls_bonus2$Commencés$tableau
+
+ls_bonus2$Commencés$graphe
+```
+
 
 ### Graphique comparaison en base 100 Corse et France metropolitaine
 
 ```{r graph3}
-purrr::map(c("aut", "com"), ~fn12_graphe_lgt_tous_base100(.x))-> ls_graph3
+purrr::map(type_lgt, ~fn12_graphe_lgt_tous_base100(.x))-> ls_graph3
 ls_graph3
 ```
 
@@ -121,14 +202,14 @@ graph4
 ### Cartographie
 
 ```{r carto}
-purrr::map(c("aut", "com"), ~fn14_carte_region_lgt_tous_evolution(.x))-> ls_carte1
+purrr::map(type_lgt, ~fn14_carte_region_lgt_tous_evolution(.x))-> ls_carte1
 ls_carte1
 ```
 
 ### Export data pour serveur
 
 ```{r tab_serveur}
-purrr::walk(c("aut", "com"), ~fn15_enregistre_tab_4serveur(.x))
+purrr::walk(type_lgt, ~fn15_enregistre_tab_4serveur(.x))
 
 ```
 
