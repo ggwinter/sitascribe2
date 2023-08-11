@@ -67,7 +67,7 @@ fn11_evol1an_type_lgt_bonus1 <- function(x = "aut") {
     ) |>
     tidyr::pivot_wider(names_from = "trimestre", values_from = "valeur") |>
     dplyr::mutate(
-      diff = trim - trim_b,
+      diff = round(trim - trim_b, 1),
       taux = 100 * round(diff / trim_b, 3),
       evolution = ifelse(taux > 0, "hausse", "baisse")
     ) -> tab3b
