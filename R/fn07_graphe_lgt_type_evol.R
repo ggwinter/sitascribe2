@@ -19,6 +19,7 @@
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 theme_bw
 #' @importFrom here here
+#' @importFrom scales label_number
 #' @importFrom stats complete.cases
 #' @importFrom tidyr pivot_longer
 #' @export
@@ -67,7 +68,8 @@ fn07_graphe_lgt_type_evol <- function(x = "aut") {
     ggplot2::scale_y_continuous(
       name = "Nombre de logements",
       limits = c(0, val_max),
-      breaks = seq(0, val_max, 1000)
+      breaks = seq(0, val_max, 1000),
+      labels = scales::label_number(big.mark = " ")
     ) +
     ggplot2::scale_colour_manual(
       values = df_palettecouleur$pal_4col %>% unlist() %>% unname(),
