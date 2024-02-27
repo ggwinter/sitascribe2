@@ -9,16 +9,17 @@
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
 #' @importFrom dplyr ungroup
+#' @importFrom plotly ggplotly
 #' @importFrom purrr set_names
 #' @importFrom utils write.csv2
 #' @export
 fn06_graphe_mensuel_np <- function(x = "aut") {
   attempt::stop_if(.x = x,
                    .p = ~!is.character(.x),
-                   msg = cli::bg_red(cli::col_yellow("x doit etre au format caractere")))
+                   msg = cli::bg_red(cli::col_yellow("x doit \u00eatre au format caract\u00e8re")))
   attempt::stop_if(.x = x,
                    .p = ~!.x %in% c("aut", "com"),
-                   msg = cli::bg_red(cli::col_yellow("x doit etre eagl a aut ou com")))
+                   msg = cli::bg_red(cli::col_yellow("x doit \u00eatre \u00e9gal \u00e0 aut ou com")))
   # graphique mensuel
   #
   lib <-dplyr::if_else(condition = x %in% "aut",
@@ -40,7 +41,9 @@ fn06_graphe_mensuel_np <- function(x = "aut") {
     ggplot2::scale_y_continuous(name = "Nombre de logements") +
     ggplot2::theme_bw() +
     ggplot2::labs(title = paste0("Nombre de logements ", lib, " estim\u00e9s par mois"),
-                  subtitle = "Non publiable")
+                  subtitle = "NON PUBLIABLE")
+
+  plotly::ggplotly(p) -> p
 
   return(p)
 

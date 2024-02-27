@@ -21,13 +21,18 @@
 #' @importFrom purrr map2
 #' @importFrom purrr set_names
 #' @importFrom readxl excel_sheets
-#' @importFrom readxl read_xlsx
+#' @importFrom readxl read_excel
 #' @importFrom stringr str_replace
+#' @importFrom stringr str_subset
+#' @importFrom writexl write_xlsx
 #' @return liste
 #' @export
 fn03_lit_tab_excel <- function(x = params$annee_mois) {
 
-  here::here("2_data", stringr::str_c("ROES_", x, ".xlsx"))-> chem_fich
+  list.files(here::here("2_data"), pattern = stringr::str_c("^ROES_", x), full.names = TRUE)-> chem_fich
+  if(length(chem_fich)>1) chem_fich |> stringr::str_subset("xlsx") -> chem_fich
+
+
   stopifnot(exprs = file.exists(chem_fich)==TRUE)
 
   choix_onglet <-
@@ -51,7 +56,8 @@ fn03_lit_tab_excel <- function(x = params$annee_mois) {
   # lecture des tableaux excel
 
   purrr::map(choix_onglet,
-             ~ readxl::read_xlsx(chem_fich, .x) %>% janitor::clean_names()) %>%
+             ~ readxl::read_excel(chem_fich, .x) %>%
+               janitor::clean_names()) %>%
     purrr::set_names(choix_onglet) -> lsm
 
   COGiter::departements %>%
@@ -128,6 +134,15 @@ fn03_lit_tab_excel <- function(x = params$annee_mois) {
   ) -> lsm
 
   uti_transpose_liste(lsm)-> lsm
+# si fichier xls on le remplace par un fichier xlsx
+  if(grepl(pattern = ".xls$", chem_fich)) {
+    readxl::excel_sheets(chem_fich) |> purrr::set_names() -> eff
+    purrr::map(eff,
+               ~ readxl::read_excel(chem_fich[1], .x)) -> eff
+    writexl::write_xlsx(eff, here::here("2_data", paste0("ROES_", x, ".xlsx")))
+    unlink(chem_fich)
+    rm(eff)
+  }
 
   return(lsm)
 

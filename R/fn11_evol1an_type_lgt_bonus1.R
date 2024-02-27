@@ -22,6 +22,7 @@
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 theme_minimal
 #' @importFrom here here
+#' @importFrom plotly ggplotly
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr pivot_wider
 #'
@@ -95,6 +96,7 @@ fn11_evol1an_type_lgt_bonus1 <- function(x = "aut") {
       caption = "Dernier trimestre point rouge, trimestre pr\u00e9c\u00e9dent point vert\n Attention pour chaque trimestre cumul sur 12 mois"
     ) -> p
 
+
   filename <- here::here(
     "4_resultats",
     params$annee_mois,
@@ -108,9 +110,17 @@ fn11_evol1an_type_lgt_bonus1 <- function(x = "aut") {
     unit = "cm",
     dpi = 300
   )
-
-  ls_result <- list("tableau" = DT::datatable(tab3b),
-                    "graphe" = p)
+  plotly::ggplotly(p)-> p
+  ls_result <-
+    list(
+      "tableau" = DT::datatable(
+        tab3b,
+        extensions = 'Buttons',
+        options = list(dom = 'Bfrtip',
+                       buttons = c('copy', 'csv', 'excel'))
+      ),
+      "graphe" = p
+    )
   return(ls_result)
 
 }

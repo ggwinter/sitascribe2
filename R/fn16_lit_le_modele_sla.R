@@ -34,14 +34,23 @@ fn16_lit_le_modele_sla <- function(x = 'txt_plaquette') {
   ifelse(
     test = params$modele_plaquette == "oui",
     yes = pg <-
-      xml2::read_xml(chem_plaquette, encoding = "UTF-8"),
+      xml2::read_xml(here::here("3_tables", chemin_modele), encoding = "UTF-8"),
     no = pg <-
       xml2::read_xml(plaquette_sitadel, encoding = "UTF-8")
   )
 
-  # On cherche tous les PAGEOBJECT objets dans la page
-  eff <-
-    pg %>% xml2::xml_find_all(".//PAGEOBJECT") %>% xml2::xml_attrs()
+  # On cherche tous les PAGEOBJECT (objets) dans la page
+  eff <- pg %>% xml2::xml_find_all(".//PAGEOBJECT") %>% xml2::xml_attrs()
+
+
+
+  # On supprime tous les PAGEOBJECT dont le champ ANNAME n est pas rempli.
+  #
+  which(is.na(pg %>% xml2::xml_find_all(".//PAGEOBJECT") %>% xml2::xml_attr("ANNAME"))) -> node_vide
+
+  if(length(node_vide)>0) eff[-c(node_vide)]-> eff
+
+
   eff |> purrr::set_names(paste0("O_", stringr::str_pad(string = seq_along(eff), side = "left", width = 2, pad = "0")))-> eff
 
 

@@ -22,9 +22,9 @@ params
 
 ## Choix du modele de plaquette si choix_plaquette : "oui"
 
-Avant de relancer le script, depuis Scribus ou l'explorateur dde fichier : enregistrer une plaquette modifiée à la main dans 3_tables en la nommant modele_sitadel.sla
+Avant de relancer le script, depuis Scribus ou l'explorateur de fichier : enregistrer une plaquette modifiée à la main dans 3_tables en la nommant modele_sitadel.sla
 
-```{r}
+```{r modele_scribus}
 fn00_verifie_existe_modele()
 ```
 
@@ -46,7 +46,7 @@ fn02_verifie_mois_valide()
 
 ### Lit le fichier excel
 
--   lsm liste des onglets du tableau excel donnees brutes
+-   lsm liste des onglets du tableau excel données brutes
 
 ```{r data_raw}
 fn03_lit_tab_excel()-> lsm 
@@ -55,9 +55,9 @@ fn03_lit_tab_excel()-> lsm
 
 #### Cumul sur 12 mois arrondi ou pas
 
--   lsm_12m0 donnees cumulees sur 12 mois non arrondies (calcul des taux d evolution)
+-   lsm_12m0 données cumulées sur 12 mois non arrondies (calcul des taux d'évolution)
 
--   lsm_12m donnees cumulees sur 12 mois arrondies et recalees (affichage dans les tableaux)
+-   lsm_12m données cumulées sur 12 mois arrondies et recalées (affichage dans les tableaux)
 
 ```{r data_mod}
 fn04_modifie1_liste(lsm)-> lsm_12m0
@@ -68,7 +68,7 @@ fn05_modifie2_liste(lsm_12m0)-> lsm_12m
 
 ### Graphique tous les logements par mois (non publiable)
 
-Donne une idee des volumes concernés a comparer avec le taux de remontee des informations si besoin (voir Joseph)
+Donne une idée des volumes concernés à comparer avec le taux de remontée des informations si besoin (voir Joseph)
 
 ```{r graph0}
 purrr::map(type_lgt, ~fn06_graphe_mensuel_np(.x))-> ls_graph
@@ -84,7 +84,7 @@ ls_graph1
 
 ### Graphique surfacique évolution par type tous les logements
 
-```{r graph2}
+```{r graph1b}
 purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol_area(.x))-> ls_graph1b
 ls_graph1b
 ```
