@@ -13,12 +13,12 @@
 uti_calcul_moyenne_12mois <-
   function(data) {
 
-    data %>%
-      dplyr::group_by(geo, territoire, terr_cd, type) %>%
+    data |>
+      dplyr::group_by(geo, territoire, terr_cd, type) |>
       dplyr::mutate(dplyr::across(
         dplyr::contains(c("log", "ip", "ig", "colres")),
         .fns = ~ RcppRoll::roll_sum(.x, 12, align = "right", fill = NA)
-      )) %>%
+      )) |>
       dplyr::ungroup()-> df
 
     return(df)

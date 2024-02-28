@@ -15,7 +15,7 @@ x_utilitaire_importFrom <- function(x = 'fn06_met_en_forme_liste') {
 
   stringr::str_extract_all(txt, "[:word:]*::[:word:].{3,15}(?=\\()")  |>  as.list() -> extract
   extract[which(purrr::map(extract, length) != 0)  |>  unlist()] |> unlist() |>
-    unique() |> sort() |> stringr::str_replace("::", " ")-> extract
+    unique() |> sort() |> stringr::str_replace("::", " ") -> extract
   return(extract)
 }
 

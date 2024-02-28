@@ -41,7 +41,7 @@ fn01_cree_repertoires()
 Le mois dans params (parametres) doit correspondre avec un tableau du ROeS dans 2_data
 
 ```{r test_date}
-fn02_verifie_mois_valide()
+fn02_verifie_mois_valide() -> ls_dates
 ```
 
 ### Lit le fichier excel

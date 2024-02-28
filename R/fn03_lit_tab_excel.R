@@ -56,80 +56,80 @@ fn03_lit_tab_excel <- function(x = params$annee_mois) {
   # lecture des tableaux excel
 
   purrr::map(choix_onglet,
-             ~ readxl::read_excel(chem_fich, .x) %>%
-               janitor::clean_names()) %>%
+             ~ readxl::read_excel(chem_fich, .x) |>
+               janitor::clean_names()) |>
     purrr::set_names(choix_onglet) -> lsm
 
-  COGiter::departements %>%
+  COGiter::departements |>
     dplyr::mutate(DEP = stringr::str_pad(DEP, 3, pad = "0"))-> x_cog_dep
 
   lsm$AUT_DPT-> eff
 
-  purrr::map_at(
+  purrr::map(
     .x = lsm,
     .at = dplyr::vars(dplyr::contains("FR")),
-    .f = ~ .x %>%
+    .f = ~ .x |>
       dplyr::mutate(
         "terr_cd" = "999",
         "territoire" = "France",
         "geo" = 1L
-      ) %>%
+      ) |>
       dplyr::select(dplyr::one_of(
         c("geo", "date", "terr_cd", "territoire")
-      ), dplyr::everything()) %>%
-      dplyr::arrange(terr_cd, date) %>%
-      dplyr::filter(terr_cd > 10) %>%
-      dplyr::select(-terr_cd, -territoire) %>%
-      dplyr::group_by(geo, date) %>%
-      dplyr::summarise_all(list(sum)) %>%
+      ), dplyr::everything()) |>
+      dplyr::arrange(terr_cd, date) |>
+      dplyr::filter(terr_cd > 10) |>
+      dplyr::select(-terr_cd, -territoire) |>
+      dplyr::group_by(geo, date) |>
+      dplyr::summarise_all(list(sum)) |>
       dplyr::mutate(
         terr_cd = "666",
         "territoire" = "France m\u00e9tro.",
         "geo" = 1L
-      ) %>%
+      ) |>
       dplyr::select(dplyr::one_of(
         c("geo",
           "date",
           "terr_cd",
           "territoire")
       ), dplyr::everything())
-  ) %>%
+  ) |>
     purrr::map_at(
       .at = dplyr::vars(dplyr::contains("REG")),
-      .f = ~ .x %>%
-        dplyr::rename("terr_cd" = "reg", "territoire" = "nom_reg") %>%
-        dplyr::mutate("geo" = 2L) %>%
+      .f = ~ .x |>
+        dplyr::rename("terr_cd" = "reg", "territoire" = "nom_reg") |>
+        dplyr::mutate("geo" = 2L) |>
         dplyr::select(dplyr::one_of(
           c("geo", "date", "terr_cd", "territoire")
-        ), dplyr::everything()) %>%
+        ), dplyr::everything()) |>
         dplyr::arrange(terr_cd, date)
-    ) %>%
+    ) |>
     purrr::map_at(
       .at = dplyr::vars(dplyr::contains("DPT")),
-      .f = ~ .x %>%
-        dplyr::left_join(x_cog_dep %>% dplyr::select(DEP, NCCENR), by = c("dpt" = "DEP")) %>%
+      .f = ~ .x |>
+        dplyr::left_join(x_cog_dep |> dplyr::select(DEP, NCCENR), by = c("dpt" = "DEP")) |>
         dplyr::rename("terr_cd" = "dpt",
-                      "territoire" = "NCCENR") %>%
-        dplyr::mutate("geo" = 3L) %>%
+                      "territoire" = "NCCENR") |>
+        dplyr::mutate("geo" = 3L) |>
         dplyr::select(dplyr::one_of(
           c("geo", "date", "terr_cd", "territoire")
-        ), dplyr::everything()) %>%
+        ), dplyr::everything()) |>
         dplyr::arrange(terr_cd, date)
-    ) %>%
+    ) |>
     purrr::map_at(.at = dplyr::vars(1:3),
-                  .f = ~ .x %>% dplyr::mutate(type = "aut")) %>%
+                  .f = ~ .x |> dplyr::mutate(type = "aut")) |>
     purrr::map_at(.at = dplyr::vars(4:6),
-                  .f = ~ .x %>% dplyr::mutate(type = "com")) -> lsm
+                  .f = ~ .x |> dplyr::mutate(type = "com")) -> lsm
 
   purrr::map(lsm, ~ stringr::str_replace(names(.x), "_aut|_com", "")) -> ls_new_champ
 
-  purrr::map2(lsm, ls_new_champ, ~ .x %>% purrr::set_names(.y)) -> lsm
+  purrr::map2(lsm, ls_new_champ, ~ .x |> purrr::set_names(.y)) -> lsm
 
   purrr::map_at(
     .x = lsm,
     .at = dplyr::vars(dplyr::contains("FR")),
-    .f = ~ .x %>%
-      dplyr::mutate(colres = col + res) %>%
+    .f = ~ .x |>
+      dplyr::mutate(colres = col + res) |>
       dplyr::select(geo, date, terr_cd, territoire, log, ip, ig, type, colres)
   ) -> lsm
 

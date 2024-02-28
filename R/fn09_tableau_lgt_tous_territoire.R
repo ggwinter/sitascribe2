@@ -13,15 +13,15 @@
 #' @importFrom dplyr pull
 #' @importFrom dplyr select
 #' @importFrom dplyr slice
+#' @importFrom here here
 #' @importFrom purrr set_names
 #' @importFrom stringr str_replace
-#' @importFrom utils write.csv2
 #' @export
 fn09_tableau_lgt_tous_territoire <- function(x = "aut") {
   # tableau 1 - page 1
 
-  tab1 <- bilan %>%
-    dplyr::filter(variable %in% "log", type %in% x) %>%
+  tab1 <- bilan |>
+    dplyr::filter(variable %in% "log", type %in% x) |>
     dplyr::select(type,
                   geo,
                   variable,
@@ -29,9 +29,9 @@ fn09_tableau_lgt_tous_territoire <- function(x = "aut") {
                   value,
                   diff_trim,
                   diff_trim1,
-                  diff_trim2) %>%
-    dplyr::arrange(dplyr::desc(geo)) %>%
-    dplyr::select(-geo) %>%
+                  diff_trim2) |>
+    dplyr::arrange(dplyr::desc(geo)) |>
+    dplyr::select(-geo) |>
     purrr::set_names("type",
                      "variable",
                      "territoire",
@@ -48,12 +48,12 @@ fn09_tableau_lgt_tous_territoire <- function(x = "aut") {
   # Mise en forme pour publication
 
   liste_mois_lib <-
-    df_moislib %>%
-    dplyr::filter(date %in% ls_dates$liste_mois_trim[1:3]) %>%
+    df_moislib |>
+    dplyr::filter(date %in% ls_dates$liste_mois_trim[1:3]) |>
     dplyr::pull("moislibl")
   liste_mois_lib <- paste("fin", liste_mois_lib[c(3, 2, 1)])
 
-  pl_tab1 <- tab1 %>% dplyr::select(territoire:diff_trim2)
+  pl_tab1 <- tab1 |> dplyr::select(territoire:diff_trim2)
   # rm(tab1_aut)
 
 
@@ -72,18 +72,18 @@ fn09_tableau_lgt_tous_territoire <- function(x = "aut") {
   rm(eff)
 
 
-  pl_tab1 %>%
+  pl_tab1 |>
     dplyr::mutate(nombre = format(nombre,
                                   decimal.mark = ",",
-                                  big.mark = " ")) %>%
+                                  big.mark = " ")) |>
     dplyr::mutate(
       dplyr::across(
         dplyr::contains("diff"),
-        ~ paste0(.x * 100, "%") %>% stringr::str_replace("\\.", ",")
+        ~ paste0(.x * 100, "%") |> stringr::str_replace("\\.", ",")
       ),
       territoire = as.character(territoire)
     ) -> pl_tab1
-  pl_tab1 %>% dplyr::slice(0) -> eff
+  pl_tab1 |> dplyr::slice(0) -> eff
 
   fn_dfg <-
     function(df = eff,
@@ -93,7 +93,7 @@ fn09_tableau_lgt_tous_territoire <- function(x = "aut") {
       return(df)
     }
   fn_dfg(eff, c(NA_character_, NA_character_, liste_mois_lib)) -> eff
-  pl_tab1 <- eff %>% dplyr::bind_rows(pl_tab1)
+  pl_tab1 <- eff |> dplyr::bind_rows(pl_tab1)
 
   filename <- here::here("4_resultats", params$annee_mois, "tableaux", paste0("pl_tab1_", x, ".csv"))
   utils::write.csv2(pl_tab1, filename,

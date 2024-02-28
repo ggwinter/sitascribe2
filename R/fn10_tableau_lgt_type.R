@@ -3,21 +3,22 @@
 #' @param x caractere aut ou com
 #'
 #' @return dataframe
+#' @importFrom attempt stop_if
 #' @importFrom cli bg_red
 #' @importFrom cli col_yellow
 #' @importFrom dplyr across
 #' @importFrom dplyr arrange
 #' @importFrom dplyr bind_rows
 #' @importFrom dplyr contains
-#' @importFrom dplyr desc
 #' @importFrom dplyr filter
+#' @importFrom dplyr left_join
 #' @importFrom dplyr mutate
-#' @importFrom dplyr pull
+#' @importFrom dplyr one_of
 #' @importFrom dplyr select
 #' @importFrom dplyr slice
+#' @importFrom here here
 #' @importFrom purrr set_names
 #' @importFrom stringr str_replace
-#' @importFrom utils write.csv2
 #' @export
 fn10_tableau_lgt_type <- function(x = "toto") {
 
@@ -34,8 +35,8 @@ fn10_tableau_lgt_type <- function(x = "toto") {
     msg = cli::bg_red(cli::col_yellow("aut ou com uniquement"))
   )
 
-  tab2_12m <- bilan %>%
-    dplyr::filter(territoire %in% c("Corse", "France m\u00e9tro."), type %in% x) %>%
+  tab2_12m <- bilan |>
+    dplyr::filter(territoire %in% c("Corse", "France m\u00e9tro."), type %in% x) |>
     dplyr::select(dplyr::one_of(c(
       "type",
       "variable",
@@ -44,8 +45,8 @@ fn10_tableau_lgt_type <- function(x = "toto") {
       "diff_trim"
     )))
 
-  tab2 <- tab2_12m %>%
-    dplyr::filter(territoire %in% "Corse") %>%
+  tab2 <- tab2_12m |>
+    dplyr::filter(territoire %in% "Corse") |>
     dplyr::mutate(Evolution_FRm = tab2_12m$diff_trim[!tab2_12m$territoire %in% "Corse"])
 
   # rm(tab2_12m)
@@ -60,12 +61,12 @@ fn10_tableau_lgt_type <- function(x = "toto") {
   # Mise en forme pour publication
 
   pl_tab2 <-
-    tab2 %>%
+    tab2 |>
     dplyr::select(dplyr::one_of(c(
       "variable", "value", "diff_trim", "Evolution_FRm"
-    ))) %>%
-    dplyr::left_join(df_codelgt, by = "variable") %>%
-    dplyr::select(libelle, value, diff_trim, Evolution_FRm) %>%
+    ))) |>
+    dplyr::left_join(df_codelgt, by = "variable") |>
+    dplyr::select(libelle, value, diff_trim, Evolution_FRm) |>
     purrr::set_names(c("Logements", "Nombre", "Evolution", "Evolution FRm"))
 
 
@@ -82,20 +83,20 @@ fn10_tableau_lgt_type <- function(x = "toto") {
   }
 
 
-  pl_tab2 %>%
+  pl_tab2 |>
     dplyr::mutate(
       "Nombre" = format(Nombre,
                       decimal.mark = ",",
                       big.mark = " "),
       "Logements" = as.character(Logements)
-    ) %>%
+    ) |>
     dplyr::mutate(dplyr::across(
       dplyr::contains("Evolution"),
-      ~ paste0(.x * 100, "%") %>% stringr::str_replace("\\.", ",")
+      ~ paste0(.x * 100, "%") |> stringr::str_replace("\\.", ",")
 
     )) -> pl_tab2
 
-  pl_tab2 %>% dplyr::slice(0) -> eff
+  pl_tab2 |> dplyr::slice(0) -> eff
 
   fn_dfg <-
     function(df = eff,
@@ -105,7 +106,7 @@ fn10_tableau_lgt_type <- function(x = "toto") {
       return(df)
     }
   fn_dfg(eff, c(NA_character_, NA_character_, "Corse", "France m\u00e9tro.")) -> eff
-  pl_tab2 <- eff %>% dplyr::bind_rows(pl_tab2)
+  pl_tab2 <- eff |> dplyr::bind_rows(pl_tab2)
 
   filename <-
     here::here("4_resultats",

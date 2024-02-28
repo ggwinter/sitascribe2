@@ -30,26 +30,26 @@
 #' @export
 #'
 fn11_evol1an_type_lgt_bonus1 <- function(x = "aut") {
-  tab3b <- bilan %>%
-    dplyr::filter(!variable %in% "log", type %in% x) %>%
-    dplyr::left_join(df_codelgt, by = "variable") %>%
+  tab3b <- bilan |>
+    dplyr::filter(!variable %in% "log", type %in% x) |>
+    dplyr::left_join(df_codelgt, by = "variable") |>
     dplyr::select(dplyr::one_of(c(
       "type", "territoire",
       "libelle", "trim", "trim_b"
-    ))) %>%
+    ))) |>
     tidyr::pivot_longer(
       cols = -c(type:libelle),
       names_to = "trimestre",
       values_to = "nombre"
     )
 
-  tab3c <- bilan %>%
-    dplyr::filter(variable %in% "log", type %in% x) %>%
-    dplyr::left_join(df_codelgt, by = "variable") %>%
+  tab3c <- bilan |>
+    dplyr::filter(variable %in% "log", type %in% x) |>
+    dplyr::left_join(df_codelgt, by = "variable") |>
     dplyr::select(dplyr::one_of(c(
       "type", "territoire",
       "trim", "trim_b"
-    ))) %>%
+    ))) |>
     tidyr::pivot_longer(
       cols = -c(type:territoire),
       names_to = "trimestre",

@@ -22,7 +22,7 @@ fn02_verifie_mois_valide <- function(x = params$annee_mois){
 
   # liste les fichiers excel dans 2_data
 
-  fl <- list.files(here::here("2_data"), pattern = "^ROES", full.names = FALSE) %>%
+  fl <- list.files(here::here("2_data"), pattern = "^ROES", full.names = FALSE) |>
     stringr::str_extract("[:digit:]{6}")
 
   error_data_fichier_nom_present <- function(x) {
@@ -49,13 +49,13 @@ fn02_verifie_mois_valide <- function(x = params$annee_mois){
 
 
   # t_mois_lib
-  t_mois_lib <- df_moislib %>% dplyr::filter(date <= x)
+  t_mois_lib <- df_moislib |> dplyr::filter(date <= x)
 
 
   # liste_mois_trim
-  t_mois_data <- t_mois_lib %>% dplyr::filter(date %in% x)
+  t_mois_data <- t_mois_lib |> dplyr::filter(date %in% x)
 
-  liste_mois_tlong <- t_mois_lib %>% dplyr::pull(date)
+  liste_mois_tlong <- t_mois_lib |> dplyr::pull(date)
 
 
   a <- length(liste_mois_tlong)
@@ -79,6 +79,6 @@ fn02_verifie_mois_valide <- function(x = params$annee_mois){
                    "annee" = annee,
                    "annee_nm1" = annee_nm1
   )
-  assign(x = "ls_dates", value = ls_dates, envir = .GlobalEnv)
+  return(ls_dates)
 
 }

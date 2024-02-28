@@ -37,19 +37,19 @@ fn07_graphe_lgt_type_evol <- function(x = "aut") {
     dplyr::if_else(condition = x %in% "aut", "autorises", "commences")
 
 
-  lsm_12m0$NEW_REG %>%
-    dplyr::filter(terr_cd %in% "94", type %in% x, stats::complete.cases(log)) %>%
+  lsm_12m0$NEW_REG |>
+    dplyr::filter(terr_cd %in% "94", type %in% x, stats::complete.cases(log)) |>
     dplyr::mutate(Mois =
                     paste("01",
                           substr(date, 5, 6),
                           substr(date, 3, 4),
-                          sep = "/") %>%
-                    lubridate::dmy()) %>%
-    dplyr::ungroup() %>%
-    dplyr::select(-type) %>%
+                          sep = "/") |>
+                    lubridate::dmy()) |>
+    dplyr::ungroup() |>
+    dplyr::select(-type) |>
     tidyr::pivot_longer(cols = log:colres,
                         names_to = "type",
-                        values_to = "value") %>%
+                        values_to = "value") |>
     dplyr::mutate(type = factor(type, c("log", "ip", "ig", "colres"))) -> cor_long
 
   val_max <-
@@ -72,7 +72,7 @@ fn07_graphe_lgt_type_evol <- function(x = "aut") {
       labels = scales::label_number(big.mark = " ")
     ) +
     ggplot2::scale_colour_manual(
-      values = df_palettecouleur$pal_4col %>% unlist() %>% unname(),
+      values = df_palettecouleur$pal_4col |> unlist() |> unname(),
       labels = c(
         "Total",
         "Indiv. pur",

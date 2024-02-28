@@ -3,6 +3,7 @@
 #' @param x caractere aut ou com
 #'
 #' @return graphe
+#' @importFrom attempt stop_if
 #' @importFrom cli bg_red
 #' @importFrom cli col_yellow
 #' @importFrom dplyr bind_rows
@@ -31,42 +32,40 @@ fn12_graphe_lgt_tous_base100 <- function(x = "aut"){
 
   limite <- as.character(as.numeric(params$annee_mois) - 1000)
 
-  lsm_12m0$FR %>%
-    dplyr::select(type, territoire, date, log) %>%
+  lsm_12m0$FR |>
+    dplyr::select(type, territoire, date, log) |>
     dplyr::filter(date >= limite, type %in% x, stats::complete.cases(log)) -> b100_frm
 
   b100_frm$log[1] -> val_depart
 
-  b100_frm %>%
-    dplyr::mutate(b100_log = round(log / val_depart * 100,
-                                       digits = 2
-    )) %>%
+  b100_frm |>
+    dplyr::mutate(b100_log = round(log / val_depart * 100, digits = 2)) |>
     dplyr::select(-log) -> b100_frm
 
 
 
-  lsm_12m0$NEW_REG %>%
-    dplyr::filter(terr_cd %in% "94", type %in% x , stats::complete.cases(log)) %>%
-    dplyr::select(type, territoire, date, log) %>%
+  lsm_12m0$NEW_REG |>
+    dplyr::filter(terr_cd %in% "94", type %in% x , stats::complete.cases(log)) |>
+    dplyr::select(type, territoire, date, log) |>
     dplyr::filter(date >= limite) -> b100_cor
 
   b100_cor$log[1] -> val_depart
 
-  b100_cor %>%
+  b100_cor |>
     dplyr::mutate(b100_log = round(log / val_depart * 100,
                                        digits = 2
-    )) %>%
+    )) |>
     dplyr::select(-log) -> b100_cor
 
 
-  b100_frm %>%
-    dplyr::bind_rows(b100_cor) %>%
+  b100_frm |>
+    dplyr::bind_rows(b100_cor) |>
     dplyr::mutate(
       Mois = paste("01",
                    substr(date, 5, 6),
                    substr(date, 3, 4),
                    sep = "/"
-      ) %>% lubridate::dmy(.),
+      ) |> lubridate::dmy(.),
       territoire = factor(territoire, levels = c("France m\u00e9tro.", "Corse"))
     ) -> b100_frmcor
 
@@ -74,9 +73,9 @@ fn12_graphe_lgt_tous_base100 <- function(x = "aut"){
 
   # rm(b100_frm, b100_cor)
   #
-  b100_frmcor$b100_log %>%
-    range() %>%
-    round(., -1) -> val_range
+  b100_frmcor$b100_log |>
+    range() |>
+    (\(.) round(., -1))() -> val_range
   if ((val_range[1] / 10) %% 2 != 0) {
     val_range[1] <- val_range[1] - 10
   } else {
@@ -100,7 +99,7 @@ fn12_graphe_lgt_tous_base100 <- function(x = "aut"){
   ) +
     ggplot2::geom_hline(yintercept = 100, color = "grey60") +
     ggplot2::geom_line(ggplot2::aes(linetype = territoire, color = territoire), size = 1.1) +
-    ggplot2::scale_colour_manual(values = df_palettecouleur$pal_2col %>% unlist() %>% unname()) +
+    ggplot2::scale_colour_manual(values = df_palettecouleur$pal_2col |> unlist() |> unname()) +
     ggplot2::scale_linetype_manual(values = c("twodash", "solid")) +
     ggplot2::scale_x_date(labels = scales::date_format("%Y-%m"), breaks = graduation) +
     ggplot2::scale_y_continuous(

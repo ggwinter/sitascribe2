@@ -29,19 +29,17 @@ fn19_tableaux_remplace_corps_tableau <-
             "TopPadding",
             "BottomPadding"
           ),
-          ~ xml2::xml_set_attr(fn_rc_po_no_td_allcell(id_objet),
-                               .x,
-                               1)
+          ~ xml2::xml_set_attr(fn_scri_ls_nodes_tableau(id_objet), .x, 1)
         )
 
 
-        if (fn_rc_po_no_td_numcell(id_objet, num_cell) %>%
-            xml2::xml_find_all("StoryText")  %>%
-            xml2::xml_find_all("trail") %>%
-            xml2::xml_attr(., "PARENT") %>% is.na() == FALSE) {
+        if (fn_scri_ls_nodes_cellules_tableau(id_objet, num_cell) |>
+            xml2::xml_find_all("StoryText")  |>
+            xml2::xml_find_all("trail") |>
+            xml2::xml_attr(., "PARENT") |> is.na() == FALSE) {
           xml2::xml_set_attr(
-            fn_rc_po_no_td_numcell(id_objet, num_cell) %>%
-              xml2::xml_find_all("StoryText")  %>%
+            fn_scri_ls_nodes_cellules_tableau(id_objet, num_cell) |>
+              xml2::xml_find_all("StoryText")  |>
               xml2::xml_find_all("trail"),
             "PARENT",
             NULL
@@ -56,41 +54,41 @@ fn19_tableaux_remplace_corps_tableau <-
             "TextDistRight",
             "TextVertAlign"
           ),
-          ~ xml2::xml_set_attr(fn_rc_po_no_td_numcell(id_objet, num_cell),
+          ~ xml2::xml_set_attr(fn_scri_ls_nodes_cellules_tableau(id_objet, num_cell),
                                .x,
                                "1")
         )
 
 
-        # if (ls_modele$pg %>% xml_find_all(".//PAGEOBJECT") %>% .[[id_objet]] %>%
-        #     xml_find_all("TableData") %>%
-        #     xml_find_all("Cell") %>% .[[num_cell]] %>%
-        #     xml_find_all("StoryText") %>%
-        #     xml_find_all("DefaultStyle") %>%
-        #     xml_attr("PARENT") %>% na.omit() %>% length() == 0) {
+        # if (ls_modele$pg |> xml_find_all(".//PAGEOBJECT") |> (\(.) .[[id_objet]])() |>
+        #     xml_find_all("TableData") |>
+        #     xml_find_all("Cell") |> (\(.) .[[num_cell]])() |>
+        #     xml_find_all("StoryText") |>
+        #     xml_find_all("DefaultStyle") |>
+        #     xml_attr("PARENT") |> na.omit() |> length() == 0) {
         xml2::xml_set_attr(
-          fn_rc_po_no_td_numcell(id_objet, num_cell) %>%
-            xml2::xml_find_all("StoryText") %>%
+          fn_scri_ls_nodes_cellules_tableau(id_objet, num_cell) |>
+            xml2::xml_find_all("StoryText") |>
             xml2::xml_find_all("DefaultStyle"),
           "PARENT",
           "sty_tab_droite"
         )
 
         xml2::xml_set_attr(
-          fn_rc_po_no_td_numcell(id_objet, num_cell) %>%
-            xml2::xml_find_all("StoryText") %>%
+          fn_scri_ls_nodes_cellules_tableau(id_objet, num_cell) |>
+            xml2::xml_find_all("StoryText") |>
             xml2::xml_find_all("DefaultStyle"),
           "CPARENT",
           "tab_normal"
         )
         # }
 
-        if (fn_rc_po_no_td_allcell(id_objet) %>%
-            .[[num_cell]] %>%
-            xml2::xml_find_all("StoryText") %>%
-            xml2::xml_find_all("ITEXT") %>% length() == 0) {
+        if (fn_scri_ls_nodes_tableau(id_objet) |>
+            (\(.) .[[num_cell]])() |>
+            xml2::xml_find_all("StoryText") |>
+            xml2::xml_find_all("ITEXT") |> length() == 0) {
           xml2::xml_add_child(
-            fn_rc_po_no_td_numcell(id_objet, num_cell) %>%
+            fn_scri_ls_nodes_cellules_tableau(id_objet, num_cell) |>
               xml2::xml_find_all("StoryText"),
             xml2::read_xml("<ITEXT CH=''/>")# complete les cellules sans itext
           )
@@ -98,8 +96,8 @@ fn19_tableaux_remplace_corps_tableau <-
 
         }
         xml2::xml_set_attr(
-          fn_rc_po_no_td_numcell(id_objet, num_cell) %>%
-            xml2::xml_find_all("StoryText") %>%
+          fn_scri_ls_nodes_cellules_tableau(id_objet, num_cell) |>
+            xml2::xml_find_all("StoryText") |>
             xml2::xml_find_all("ITEXT"),
           "CH",
           txt_new
@@ -114,6 +112,5 @@ fn19_tableaux_remplace_corps_tableau <-
       ),
       .f = fn_complete_tableau
     )
-
   }
 

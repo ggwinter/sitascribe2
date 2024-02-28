@@ -20,8 +20,8 @@ fn00_verifie_existe_modele <- function(x = params$modele_plaquette) {
 
   a <- character(0)
 
-  if(params$modele_plaquette == "oui" &
-     identical(a, list.files("./3_tables"))==FALSE) {
+  if (params$modele_plaquette == "oui" &
+      identical(a, list.files("./3_tables")) == FALSE) {
     if (length(grepl(pattern = "sla$", list.files("./3_tables"))) == 1) {
       cat(cli::bg_green(cli::col_black(
         paste0(
@@ -41,8 +41,7 @@ fn00_verifie_existe_modele <- function(x = params$modele_plaquette) {
       chemin_modele <- ""
     }
 
-  stopifnot(test == "ok")
+    stopifnot(test == "ok")
   }
   return(chemin_modele)
 }
-
