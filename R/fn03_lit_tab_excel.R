@@ -4,8 +4,8 @@
 #' @importFrom attempt stop_if
 #' @importFrom cli bg_red
 #' @importFrom cli col_yellow
+#' @importFrom dplyr all_of
 #' @importFrom dplyr arrange
-#' @importFrom dplyr contains
 #' @importFrom dplyr everything
 #' @importFrom dplyr filter
 #' @importFrom dplyr group_by
@@ -15,25 +15,31 @@
 #' @importFrom dplyr rename
 #' @importFrom dplyr select
 #' @importFrom dplyr summarise_all
-#' @importFrom dplyr vars
+#' @importFrom here here
 #' @importFrom janitor clean_names
-#' @importFrom purrr map_at
-#' @importFrom purrr map2
+#' @importFrom purrr imap
 #' @importFrom purrr set_names
 #' @importFrom readxl excel_sheets
 #' @importFrom readxl read_excel
+#' @importFrom stringr str_c
+#' @importFrom stringr str_extract
+#' @importFrom stringr str_pad
 #' @importFrom stringr str_replace
 #' @importFrom stringr str_subset
 #' @importFrom writexl write_xlsx
 #' @return liste
 #' @export
 fn03_lit_tab_excel <- function(x = params$annee_mois) {
+  list.files(
+    here::here("2_data"),
+    pattern = stringr::str_c("^ROES_", x),
+    full.names = TRUE
+  ) -> chem_fich
+  if (length(chem_fich) > 1)
+    chem_fich |> stringr::str_subset("xlsx") -> chem_fich
 
-  list.files(here::here("2_data"), pattern = stringr::str_c("^ROES_", x), full.names = TRUE)-> chem_fich
-  if(length(chem_fich)>1) chem_fich |> stringr::str_subset("xlsx") -> chem_fich
 
-
-  stopifnot(exprs = file.exists(chem_fich)==TRUE)
+  stopifnot(exprs = file.exists(chem_fich) == TRUE)
 
   choix_onglet <-
     c("AUT_FR",
@@ -49,8 +55,12 @@ fn03_lit_tab_excel <- function(x = params$annee_mois) {
   attempt::stop_if(
     .x = choix_onglet,
     .p = error_fichier_xlsx_onglet_incorrect,
-    msg = cli::bg_red(cli::col_yellow("Data PB : Au moins un des onglets du tableau excel a un nom qui
-        ne correspond pas au mod\u00e8le - Georges"))
+    msg = cli::bg_red(
+      cli::col_yellow(
+        "Data PB : Au moins un des onglets du tableau excel a un nom qui
+        ne correspond pas au mod\u00e8le - Georges"
+      )
+    )
   )
 
   # lecture des tableaux excel
@@ -61,81 +71,79 @@ fn03_lit_tab_excel <- function(x = params$annee_mois) {
     purrr::set_names(choix_onglet) -> lsm
 
   COGiter::departements |>
-    dplyr::mutate(DEP = stringr::str_pad(DEP, 3, pad = "0"))-> x_cog_dep
+    dplyr::mutate(DEP = stringr::str_pad(DEP, 3, pad = "0")) -> x_cog_dep
 
-  lsm$AUT_DPT-> eff
+  lsm$AUT_DPT -> eff
 
-  purrr::map(
-    .x = lsm,
-    .at = dplyr::vars(dplyr::contains("FR")),
-    .f = ~ .x |>
-      dplyr::mutate(
-        "terr_cd" = "999",
-        "territoire" = "France",
-        "geo" = 1L
-      ) |>
-      dplyr::select(dplyr::one_of(
-        c("geo", "date", "terr_cd", "territoire")
-      ), dplyr::everything()) |>
-      dplyr::arrange(terr_cd, date) |>
-      dplyr::filter(terr_cd > 10) |>
-      dplyr::select(-terr_cd, -territoire) |>
-      dplyr::group_by(geo, date) |>
-      dplyr::summarise_all(list(sum)) |>
-      dplyr::mutate(
-        terr_cd = "666",
-        "territoire" = "France m\u00e9tro.",
-        "geo" = 1L
-      ) |>
-      dplyr::select(dplyr::one_of(
-        c("geo",
+  fn_modifie_lsm <- function(data, nom) {
+    if (grepl(pattern = "FR", nom) == TRUE) {
+      data |>
+        dplyr::mutate("terr_cd" = "999",
+                      "territoire" = "France",
+                      "geo" = 1L) |>
+        dplyr::select(dplyr::one_of(c(
+          "geo", "date", "terr_cd", "territoire"
+        )), dplyr::everything())  |>
+        dplyr::arrange(terr_cd, date) |>
+        dplyr::filter(terr_cd > 10) |>
+        dplyr::select(-terr_cd, -territoire) |>
+        dplyr::group_by(geo, date) |>
+        dplyr::summarise_all(list(sum)) |>
+        dplyr::mutate(terr_cd = "666",
+                      "territoire" = "France m\u00e9tro.",
+                      "geo" = 1L) -> data_resultat
+
+    } else{
+      if (grepl(pattern = "REG", nom) == TRUE) {
+        data |>
+          dplyr::rename("terr_cd" = "reg", "territoire" = "nom_reg") |>
+          dplyr::mutate("geo" = 2L) -> data_resultat
+      } else{
+        data |>
+          dplyr::left_join(x_cog_dep |> dplyr::select(DEP, NCCENR),
+                           by = c("dpt" = "DEP")) |>
+          dplyr::rename("terr_cd" = "dpt",
+                        "territoire" = "NCCENR") |>
+          dplyr::mutate("geo" = 3L) -> data_resultat
+      }
+    }
+    data_resultat  |>
+      dplyr::mutate("type" = stringr::str_extract(nom, "^.{3,6}(?=_)") |> tolower()) -> data_resultat
+
+    names(data_resultat) <-
+      stringr::str_replace(names(data_resultat),
+                  pattern = "_aut|_com",
+                  replacement = "")
+
+    if (grepl(pattern = "FR", nom) == TRUE) {
+      data_resultat |> dplyr::mutate(colres = col + res) |>
+        select(-col, -res) -> data_resultat
+    }
+    data_resultat  |>
+      dplyr::select(dplyr::all_of(
+        c(
+          "geo",
           "date",
           "terr_cd",
-          "territoire")
-      ), dplyr::everything())
-  ) |>
-    purrr::map_at(
-      .at = dplyr::vars(dplyr::contains("REG")),
-      .f = ~ .x |>
-        dplyr::rename("terr_cd" = "reg", "territoire" = "nom_reg") |>
-        dplyr::mutate("geo" = 2L) |>
-        dplyr::select(dplyr::one_of(
-          c("geo", "date", "terr_cd", "territoire")
-        ), dplyr::everything()) |>
-        dplyr::arrange(terr_cd, date)
-    ) |>
-    purrr::map_at(
-      .at = dplyr::vars(dplyr::contains("DPT")),
-      .f = ~ .x |>
-        dplyr::left_join(x_cog_dep |> dplyr::select(DEP, NCCENR), by = c("dpt" = "DEP")) |>
-        dplyr::rename("terr_cd" = "dpt",
-                      "territoire" = "NCCENR") |>
-        dplyr::mutate("geo" = 3L) |>
-        dplyr::select(dplyr::one_of(
-          c("geo", "date", "terr_cd", "territoire")
-        ), dplyr::everything()) |>
-        dplyr::arrange(terr_cd, date)
-    ) |>
-    purrr::map_at(.at = dplyr::vars(1:3),
-                  .f = ~ .x |> dplyr::mutate(type = "aut")) |>
-    purrr::map_at(.at = dplyr::vars(4:6),
-                  .f = ~ .x |> dplyr::mutate(type = "com")) -> lsm
+          "territoire",
+          "log",
+          "ip",
+          "ig",
+          "colres",
+          "type"
+        )
+      )) |>
+      dplyr::arrange(terr_cd, date) -> data_resultat
+    return(data_resultat)
+  }
+  # fn_modifie_lsm(data = lsm[[1]], nom = names(lsm[1]))
 
-  purrr::map(lsm, ~ stringr::str_replace(names(.x), "_aut|_com", "")) -> ls_new_champ
+  purrr::imap(lsm, fn_modifie_lsm) -> lsm
 
-  purrr::map2(lsm, ls_new_champ, ~ .x |> purrr::set_names(.y)) -> lsm
 
-  purrr::map_at(
-    .x = lsm,
-    .at = dplyr::vars(dplyr::contains("FR")),
-    .f = ~ .x |>
-      dplyr::mutate(colres = col + res) |>
-      dplyr::select(geo, date, terr_cd, territoire, log, ip, ig, type, colres)
-  ) -> lsm
-
-  uti_transpose_liste(lsm)-> lsm
-# si fichier xls on le remplace par un fichier xlsx
-  if(grepl(pattern = ".xls$", chem_fich)) {
+  uti_transpose_liste(lsm) -> lsm
+  # si fichier xls on le remplace par un fichier xlsx
+  if (grepl(pattern = ".xls$", chem_fich)) {
     readxl::excel_sheets(chem_fich) |> purrr::set_names() -> eff
     purrr::map(eff,
                ~ readxl::read_excel(chem_fich[1], .x)) -> eff
@@ -147,3 +155,4 @@ fn03_lit_tab_excel <- function(x = params$annee_mois) {
   return(lsm)
 
 }
+

@@ -39,7 +39,7 @@ fn13_graphe_lgt_tous_autcom_dep <- function(data = lsm_12m0$DPT) {
         paste("01",
               substr(date, 5, 6),
               substr(date, 3, 4),
-              sep = "/") |> lubridate::dmy(.),
+              sep = "/") |> lubridate::dmy(),
       type = dplyr::case_when(
         type %in% "aut" ~ "autoris\u00e9s",
         type %in% "com" ~ "commenc\u00e9s"
@@ -55,7 +55,7 @@ fn13_graphe_lgt_tous_autcom_dep <- function(data = lsm_12m0$DPT) {
     sit_drp_autcom_dptcor,
     ggplot2::aes(x = Mois, y = log, group = type)
   ) +
-    ggplot2::geom_line(ggplot2::aes(linetype = type, color = type), size = 1.1) +
+    ggplot2::geom_line(ggplot2::aes(linetype = type, color = type), linewidth = 1.1) +
     ggplot2::scale_colour_manual(values = df_palettecouleur$pal_2col |> unlist() |> unname()) +
     ggplot2::scale_linetype_manual(values = c("solid", "twodash")) +
     ggplot2::facet_wrap(~territoire) +
@@ -90,8 +90,8 @@ fn13_graphe_lgt_tous_autcom_dep <- function(data = lsm_12m0$DPT) {
         fill = "transparent",
         color = "transparent"
       ),
-      legend.position = c(1.0, 0.6),
-      legend.justification = c(1.2, 0)
+      legend.position.inside = c(1.0, 0.6),
+      legend.justification.inside = c(1.2, 0)
     ) +
     ggplot2::guides(
       colour = ggplot2::guide_legend(title = NULL),

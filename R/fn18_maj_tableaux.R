@@ -1,4 +1,4 @@
-#' fn18_tableaux_cellule_a_remplacer
+#' fn18_maj_tableaux
 #'
 #' Scribus : tableaux, tableau des cellules a remplacer
 #'
@@ -22,7 +22,7 @@
 #' @importFrom utf8 as_utf8
 #' @importFrom utf8 utf8_valid
 #' @export
-fn18_tableaux_cellule_a_remplacer <- function(data = ls_tab) {
+fn18_maj_tableaux <- function(data = ls_tab) {
   # Modification des tableaux --------
   #
   purrr::map(data,
@@ -78,11 +78,12 @@ fn18_tableaux_cellule_a_remplacer <- function(data = ls_tab) {
     dplyr::left_join(df_tab_contenu, by = c("id_objet", "lgn", "col")) -> ls_modele$t_tableaux_cell
 
   ls_modele$t_tableaux_cell |>
-    dplyr::filter(stats::complete.cases(txt_new)) -> toto
+    dplyr::filter(complete.cases(txt_new)) -> toto
 
-  purrr::pwalk(list(toto$id_objet,
-                    toto$num_cell,
-                    toto$txt_new),
+  purrr::pwalk(list("id_objet" = toto$id_objet,
+                    "num_cell" = toto$num_cell,
+                    "txt_new" = toto$txt_new),
                .f = fn_scri_modifie_tableau)
 
+  return(toto)
 }

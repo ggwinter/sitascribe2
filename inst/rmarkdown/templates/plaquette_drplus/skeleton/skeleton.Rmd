@@ -49,7 +49,7 @@ fn02_verifie_mois_valide() -> ls_dates
 -   lsm liste des onglets du tableau excel données brutes
 
 ```{r data_raw}
-fn03_lit_tab_excel()-> lsm 
+fn03_lit_tab_excel() -> lsm 
 
 ```
 
@@ -60,8 +60,8 @@ fn03_lit_tab_excel()-> lsm
 -   lsm_12m données cumulées sur 12 mois arrondies et recalées (affichage dans les tableaux)
 
 ```{r data_mod}
-fn04_modifie1_liste(lsm)-> lsm_12m0
-fn05_modifie2_liste(lsm_12m0)-> lsm_12m
+fn04_modifie1_liste(lsm) -> lsm_12m0
+fn05_modifie2_liste(lsm_12m0) -> lsm_12m
 ```
 
 ## Sorties (tableaux, illustrations)
@@ -71,21 +71,21 @@ fn05_modifie2_liste(lsm_12m0)-> lsm_12m
 Donne une idée des volumes concernés à comparer avec le taux de remontée des informations si besoin (voir Joseph)
 
 ```{r graph0}
-purrr::map(type_lgt, ~fn06_graphe_mensuel_np(.x))-> ls_graph
+purrr::map(type_lgt, ~fn06_graphe_mensuel_np(.x)) -> ls_graph
 ls_graph
 ```
 
 ### Graphique évolution par type tous les logements
 
 ```{r graph1}
-purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol(.x))-> ls_graph1
+purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol(.x)) -> ls_graph1
 ls_graph1
 ```
 
 ### Graphique surfacique évolution par type tous les logements
 
 ```{r graph1b}
-purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol_area(.x))-> ls_graph1b
+purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol_area(.x)) -> ls_graph1b
 ls_graph1b
 ```
 
@@ -93,27 +93,27 @@ ls_graph1b
 ### Tableau Bilan (doc travail)
 
 ```{r tab_travail}
-fn08_tableau_bilan()-> bilan
+fn08_tableau_bilan() -> bilan
 ```
 
 ### Tableau plaquette 1
 
 ```{r tab1}
-purrr::map(type_lgt, ~fn09_tableau_lgt_tous_territoire(.x))-> ls_tab1
+purrr::map(type_lgt, ~fn09_tableau_lgt_tous_territoire(.x)) -> ls_tab1
 ls_tab1
 ```
 
 ### Tableaux plaquette 2
 
 ```{r tab2}
-purrr::map(type_lgt, ~fn10_tableau_lgt_type(.x))-> ls_tab2
+purrr::map(type_lgt, ~fn10_tableau_lgt_type(.x)) -> ls_tab2
 ls_tab2
 ```
 
 ### Graphique part de chaque type de logements
 
 ```{r graph2}
-purrr::map(type_lgt, ~fn11_graphe_barres_lgt_type_territoire(.x))-> ls_graph2
+purrr::map(type_lgt, ~fn11_graphe_barres_lgt_type_territoire(.x)) -> ls_graph2
 ls_graph2
 ```
 
@@ -124,7 +124,7 @@ trim_b: cumul de 12 mois à la date du dernier mois - 1 an
 
 ```{r bonus1}
 
-purrr::map(type_lgt, fn11_evol1an_type_lgt_bonus1)-> ls_bonus1
+purrr::map(type_lgt, fn11_evol1an_type_lgt_bonus1) -> ls_bonus1
 ```
 
 #### Logement autorisés
@@ -188,7 +188,7 @@ ls_bonus2$Commencés$graphe
 ### Graphique comparaison en base 100 Corse et France metropolitaine
 
 ```{r graph3}
-purrr::map(type_lgt, ~fn12_graphe_lgt_tous_base100(.x))-> ls_graph3
+purrr::map(type_lgt, ~fn12_graphe_lgt_tous_base100(.x)) -> ls_graph3
 ls_graph3
 ```
 
@@ -202,7 +202,7 @@ graph4
 ### Cartographie
 
 ```{r carto}
-purrr::map(type_lgt, ~fn14_carte_region_lgt_tous_evolution(.x))-> ls_carte1
+purrr::map(type_lgt, ~fn14_carte_region_lgt_tous_evolution(.x)) -> ls_carte1
 ls_carte1
 ```
 
@@ -229,15 +229,14 @@ ls_tab <- list("tab1" = ls_tab1[[1]],
 ### lit le modele de plaquette
 
 ```{r lit_modele}
-fn16_lit_le_modele_sla()-> ls_modele
+fn16_lit_le_modele_sla() -> ls_modele
 ```
 
 ### Actualise son contenu
 
 ```{r actualise_modele}
 fn17_modifie_objet_by_id_newvalue()
-fn18_tableaux_cellule_a_remplacer()-> toto
-fn19_tableaux_remplace_corps_tableau()
+fn18_maj_tableaux() -> toto
 fn20_actualise_date_titre(x = params$annee_mois)
 fn21_tableaux_met_en_forme_2ndeligne()
 

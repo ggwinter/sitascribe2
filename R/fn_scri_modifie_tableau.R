@@ -5,6 +5,13 @@
 #' @param txt_new  nouveau texte pour remplacer l ancien
 #'
 #' @return nothing
+#'
+#' @importFrom purrr walk
+#' @importFrom xml2 read_xml
+#' @importFrom xml2 xml_add_child
+#' @importFrom xml2 xml_attr
+#' @importFrom xml2 xml_find_all
+#' @importFrom xml2 xml_set_attr
 #' @export
 #'
 fn_scri_modifie_tableau <- function(id_objet = "211587152" ,
@@ -19,7 +26,7 @@ fn_scri_modifie_tableau <- function(id_objet = "211587152" ,
       "BottomPadding"
     ),
     ~ xml2::xml_set_attr(fn_scri_ls_nodes_tableau(id_objet),
-                         .id_objet,
+                         .x,
                          1)
   )
 
@@ -27,7 +34,7 @@ fn_scri_modifie_tableau <- function(id_objet = "211587152" ,
   if (fn_scri_ls_nodes_cellules_tableau(id_objet, num_cell) |>
       xml2::xml_find_all("StoryText")  |>
       xml2::xml_find_all("trail") |>
-      xml2::xml_attr(., "PARENT") |> is.na() == FALSE) {
+      xml2::xml_attr("PARENT") |> is.na() == FALSE) {
     xml2::xml_set_attr(
       fn_scri_ls_nodes_cellules_tableau(id_objet, num_cell) |>
         xml2::xml_find_all("StoryText")  |>
@@ -47,7 +54,7 @@ fn_scri_modifie_tableau <- function(id_objet = "211587152" ,
       "TextVertAlign"
     ),
     ~ xml2::xml_set_attr(fn_scri_ls_nodes_cellules_tableau(id_objet, num_cell),
-                         .id_objet,
+                         .x,
                          "1")
   )
 
