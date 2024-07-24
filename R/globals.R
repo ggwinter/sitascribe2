@@ -46,6 +46,7 @@ utils::globalVariables(
     "NCCENR",
     "nombre",
     "node_vide",
+    "nom_modele",
     "nombrec",
     "nom_objet",
     "Nombre",

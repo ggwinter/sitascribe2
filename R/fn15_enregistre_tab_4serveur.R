@@ -47,7 +47,7 @@ fn15_enregistre_tab_4serveur <- function(x = "aut") {
 
 
   lsm_12m$DPT |>
-    dplyr::filter(terr_cd %in% c("02A", "02B")) |>
+    dplyr::filter(terr_cd %in% c("02A", "02B"), type %in% x) |>
     dplyr::ungroup() |>
     dplyr::select(-geo, -type) |>
     dplyr::mutate(annee = stringr::str_sub(date, 1, 4)) |>

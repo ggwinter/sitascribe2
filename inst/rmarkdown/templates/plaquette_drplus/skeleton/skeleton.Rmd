@@ -4,7 +4,8 @@ author: "G.Winterstein"
 date: "2023-08-11"
 params: 
   annee_mois: "202202"
-  modele_plaquette: "non"
+  modele_plaquette: "oui"
+  modele_nom: "SITADEL_Version_2024_03.sla"
 output: html_document
 ---
 
@@ -22,10 +23,31 @@ params
 
 ## Choix du modele de plaquette si choix_plaquette : "oui"
 
-Avant de relancer le script, depuis Scribus ou l'explorateur de fichier : enregistrer une plaquette modifiée à la main dans 3_tables en la nommant modele_sitadel.sla
+Avant de relancer le script, depuis Scribus ou l'explorateur de fichier : enregistrer une plaquette modifiée à la main dans 3_tables en la nommant comme vous voulez.
+
+**ATTENTION : Pour que cela fonctionne, il faut créer la plaquette modèle à partir d'un fichier sla du répertoire résultats dans le même répertoire ex 202403 en créant une copie, la renommer autrement, sinon vous perdez tous les liens vers les images de la plaquette.**
+
+Où placer les nouvelles images en cas de remplacement :
+
+Comme les images, hors graphiques et cartes, s'affichent dans **toutes les plaquettes,** elles se trouvent dans **construction_neuve/4_resultats/00_logo** : logos, QR Code, dessin grue, photo d'illustration. Enregistrer l'image à la place de l'ancienne avec le même nom (en ayant sauvegardé ailleurs les anciennes images en cas de pb).
+
+Si besoin de copier sur un autre répertoire ailleurs, le lien vers les images permanentes sera à reconfigurer (mais est ce bien nécessaire?, il suffit de travailler sur le fichier renommé en \_T2 dans le répertoire résultats/anneemois et d'enregistrer le pdf ailleurs).
+
+ou
+
+-   créer un repertoire plaquette_sitadel (ou toto) à un autre emplacement (etudes_en_cours), avec les sous-répertoires suivants 
+
+    -   00_logo
+
+    -   ma_plaquette (ou tata)
+
+        -   images
+
+Placer les images dans images, tout ce qui est dans 00_logo dans logo et le fichier sla dans ma_plaquette et lancer scribus. Ca devrait fonctionner **sauf si vous utilisez des versions différentes de Scribus**.
 
 ```{r modele_scribus}
-fn00_verifie_existe_modele()
+fn00_verifie_existe_modele()-> nom_modele
+
 ```
 
 ## Entrees (data)
@@ -89,7 +111,6 @@ purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol_area(.x)) -> ls_graph1b
 ls_graph1b
 ```
 
-
 ### Tableau Bilan (doc travail)
 
 ```{r tab_travail}
@@ -119,8 +140,7 @@ ls_graph2
 
 ### Bonus1 evolution sur un an pour chaque type de logements
 
-trim : cumul de 12 mois à la date du dernier mois
-trim_b: cumul de 12 mois à la date du dernier mois - 1 an
+trim : cumul de 12 mois à la date du dernier mois trim_b: cumul de 12 mois à la date du dernier mois - 1 an
 
 ```{r bonus1}
 
@@ -129,16 +149,13 @@ purrr::map(type_lgt, fn11_evol1an_type_lgt_bonus1) -> ls_bonus1
 
 #### Logement autorisés
 
-
 ```{r, fig.dim=c(10,6)}
 ls_bonus1$Autorisés$tableau
 
 ls_bonus1$Autorisés$graphe
 ```
 
-
 #### Logements commencés
-
 
 ```{r, fig.dim=c(10,6)}
 ls_bonus1$Commencés$tableau
@@ -146,12 +163,9 @@ ls_bonus1$Commencés$tableau
 ls_bonus1$Commencés$graphe
 ```
 
-
-
 ### Bonus2 evolution sur un an pour tous les logements
 
-trim : cumul de 12 mois à la date du dernier mois
-trim_b: cumul de 12 mois à la date du dernier mois - 1 an
+trim : cumul de 12 mois à la date du dernier mois trim_b: cumul de 12 mois à la date du dernier mois - 1 an
 
 ```{r bonus2}
 
@@ -159,10 +173,7 @@ purrr::map(type_lgt, fn11_evol1an_type_lgt_bonus2) -> ls_bonus2
 
 ```
 
-
 #### Logements Autorisés
-
-
 
 ```{r, fig.dim=c(10,4)}
 
@@ -171,11 +182,7 @@ ls_bonus2$Autorisés$tableau
 ls_bonus2$Autorisés$graphe
 ```
 
-
-
 #### Logements commencés
-
-
 
 ```{r, fig.dim=c(10,4)}
 
@@ -183,7 +190,6 @@ ls_bonus2$Commencés$tableau
 
 ls_bonus2$Commencés$graphe
 ```
-
 
 ### Graphique comparaison en base 100 Corse et France metropolitaine
 
@@ -213,7 +219,7 @@ purrr::walk(type_lgt, ~fn15_enregistre_tab_4serveur(.x))
 
 ```
 
-### Recapitulatif tableaux plaquette
+### Récapitulatif tableaux plaquette
 
 ```{r }
 ls_tab <- list("tab1" = ls_tab1[[1]],
@@ -230,6 +236,7 @@ ls_tab <- list("tab1" = ls_tab1[[1]],
 
 ```{r lit_modele}
 fn16_lit_le_modele_sla() -> ls_modele
+
 ```
 
 ### Actualise son contenu
@@ -241,5 +248,3 @@ fn20_actualise_date_titre(x = params$annee_mois)
 fn21_tableaux_met_en_forme_2ndeligne()
 
 ```
-
-

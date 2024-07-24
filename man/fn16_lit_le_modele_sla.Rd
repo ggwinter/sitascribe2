@@ -14,5 +14,5 @@ liste
 }
 \description{
 Scribus : texte, lit la plaquette modele, supprime les lignes et en cree
-autant de vides que dans le nouveau texte
+autant de vides que dans le nouveau texte des tableaux.
 }

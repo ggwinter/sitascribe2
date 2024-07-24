@@ -4,7 +4,7 @@
 \alias{fn00_verifie_existe_modele}
 \title{fn00_verifie_existe_modele}
 \usage{
-fn00_verifie_existe_modele(x = params$modele_plaquette)
+fn00_verifie_existe_modele(x = params)
 }
 \arguments{
 \item{x}{character oui ou non}

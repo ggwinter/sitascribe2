@@ -9,39 +9,37 @@
 #' @importFrom cli col_yellow
 #' @export
 #'
-fn00_verifie_existe_modele <- function(x = params$modele_plaquette) {
-  chemin_modele <- vector(mode = "character")
+fn00_verifie_existe_modele <- function(x = params) {
+
   # verifie que modele_plaquette est oui ou non
   stopifnot(params$modele_plaquette %in% c("oui", "non"))
 
-  # modele_plaquette oui    des fichiers dans 3_tables
-  #     un seul fichier sla     c est celui que l\u0027on a choisi
-  #     deux fichiers sla   pb
-
   a <- character(0)
+  # on verifie qu il y a au moins un fichier sla dans 3_tables
+  # puis que son nom correspond
 
   if (params$modele_plaquette == "oui" &
       identical(a, list.files("./3_tables")) == FALSE) {
-    if (length(grepl(pattern = "sla$", list.files("./3_tables"))) == 1) {
+    if (any(grepl(pattern = params$modele_nom, list.files("./3_tables"))) == TRUE) {
       cat(cli::bg_green(cli::col_black(
         paste0(
           "Vous avez choisi comme mod\u00e8le le fichier : ",
-          list.files("./3_tables", pattern = "sla$")
+          params$modele_nom," \n"
         )
       )))
       test <- "ok"
-      chemin_modele <- list.files("./3_tables", pattern = "sla$")
+      nom_modele <- params$modele_nom
     } else{
       cat(cli::bg_red(
         cli::col_yellow(
-          "Attention il y a plusieurs fichiers sla dans 3_tables\nsupprimez ceux inutiles\n"
+          paste0( "Attention il n'y a pas de fichier ", params$modele_nom," dans 3_tables\n")
         )
       ))
       test <- "pb"
-      chemin_modele <- ""
+      nom_modele <- ""
     }
 
     stopifnot(test == "ok")
   }
-  return(chemin_modele)
+  return(nom_modele)
 }
