@@ -13,5 +13,5 @@ fn02_verifie_mois_valide(x = params$annee_mois)
 nothing
 }
 \description{
-Verifie que la date entree dans les parametres correspond bien a un tableau present dans 2_data
+Vérifie que la date entrée dans les paramètres correspond bien a un tableau présent dans 2_data
 }

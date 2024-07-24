@@ -7,7 +7,7 @@ Description: Realisation de la plaquette trimestrielle sitadel dr plus a partir 
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Imports: 
     attempt,
     cli,
@@ -18,7 +18,7 @@ Imports:
     here,
     janitor,
     lubridate,
-    magrittr,
+    plotly,
     purrr,
     RcppRoll,
     readxl,
@@ -32,6 +32,7 @@ Imports:
     usethis,
     utf8,
     utils,
+    writexl,
     xml2
 Depends: 
     R (>= 2.10)

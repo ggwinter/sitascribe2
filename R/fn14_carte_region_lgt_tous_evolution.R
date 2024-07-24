@@ -56,23 +56,23 @@ fn14_carte_region_lgt_tous_evolution <- function(x = "aut") {
       )
   }
 
-  map_regshp <- map_regwkt %>%
-    dplyr::mutate(geometry = sf::st_as_sfc(geom_wkt)) %>%
-    dplyr::select(-geom_wkt) %>% sf::st_as_sf(., crs = 2154)
+  map_regshp <- map_regwkt |>
+    dplyr::mutate(geometry = sf::st_as_sfc(geom_wkt)) |>
+    dplyr::select(-geom_wkt) |> sf::st_as_sf(crs = 2154)
 
   # carto REG logements autorises
 
 
-  sit_drp_regfrm <- lsm_12m0$NEW_REG %>%
-    dplyr::filter(terr_cd > 10, type %in% x, date %in% c(params$annee_mois, ls_dates$liste_mois[2])) %>%
-    dplyr::ungroup() %>%
-    dplyr::select(dplyr::one_of(c("type", "terr_cd", "territoire", "date", "log"))) %>%
+  sit_drp_regfrm <- lsm_12m0$NEW_REG |>
+    dplyr::filter(terr_cd > 10, type %in% x, date %in% c(params$annee_mois, ls_dates$liste_mois[2])) |>
+    dplyr::ungroup() |>
+    dplyr::select(dplyr::one_of(c("type", "terr_cd", "territoire", "date", "log"))) |>
     tidyr::pivot_wider(names_from = date,
-                       values_from = log) %>%
-    purrr::set_names("type", "terr_cd", "territoire", "an_prec", "an") %>%
+                       values_from = log) |>
+    purrr::set_names("type", "terr_cd", "territoire", "an_prec", "an") |>
     dplyr::mutate(diff = round((an - an_prec) / an_prec, digits = 3))
 
-  sit_drp_regfrm %>% dplyr::pull(diff) -> liste_valeurs_diff
+  sit_drp_regfrm |> dplyr::pull(diff) -> liste_valeurs_diff
 
   range(liste_valeurs_diff) -> range_valeurs_diff
   floor(10 * range_valeurs_diff[1]) / 10 -> val_min
@@ -102,8 +102,8 @@ fn14_carte_region_lgt_tous_evolution <- function(x = "aut") {
     )
 
   map_reg <-
-    map_regshp %>% dplyr::left_join(sit_drp_regfrm,
-                                    by = c("INSEE_REG" = "terr_cd"))
+    map_regshp |> dplyr::left_join(sit_drp_regfrm,
+                                   by = c("INSEE_REG" = "terr_cd"))
 
   p <- ggplot2::ggplot(map_reg, ggplot2::aes(fill = diff)) +
     ggplot2::geom_sf(lwd = 1, colour = "grey90") + # , colour = "red"
@@ -136,10 +136,11 @@ fn14_carte_region_lgt_tous_evolution <- function(x = "aut") {
     )
 
 
-  p + ggplot2::geom_sf_text(ggplot2::aes(label = round(diff * 100, 2) %>%
-                                           format(., decimal.mark=",")), size = 3.6) +
-    ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(size = 4, colour = "transparent", lwd = 0),
-                                                 reverse = TRUE)) -> p
+  p + ggplot2::geom_sf_text(ggplot2::aes(label = format(round(diff * 100, 2), decimal.mark = ",")), size = 3.6) +
+    ggplot2::guides(fill = ggplot2::guide_legend(
+      override.aes = list(size = 4, colour = "transparent", lwd = 0),
+      reverse = TRUE
+    )) -> p
   p
 
   filename <-here::here("4_resultats", params$annee_mois, "images", paste0("reg_log_12m_chiffres_", x, ".png"))

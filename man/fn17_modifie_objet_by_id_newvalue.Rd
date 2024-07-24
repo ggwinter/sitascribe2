@@ -5,17 +5,17 @@
 \title{fn17_modifie_objet_by_id_newvalue}
 \usage{
 fn17_modifie_objet_by_id_newvalue(
-  x = ls_modele$t_images$id_objet,
-  y = ls_modele$t_images$attr,
-  z = ls_modele$t_images$new_value
+  id_objet = ls_modele$t_images$id_objet,
+  attr = ls_modele$t_images$attr,
+  new_value = ls_modele$t_images$new_value
 )
 }
 \arguments{
-\item{x}{identifiant scribus de l objet}
+\item{id_objet}{identifiant scribus de l objet}
 
-\item{y}{le nom de l attribut}
+\item{attr}{le nom de l attribut}
 
-\item{z}{la nouvelle valeur}
+\item{new_value}{la nouvelle valeur}
 }
 \value{
 nothing

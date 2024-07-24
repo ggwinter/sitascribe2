@@ -3,6 +3,7 @@
 #' @param x caractere aut ou com
 #'
 #' @return graphique
+#' @importFrom attempt stop_if
 #' @importFrom cli bg_red
 #' @importFrom cli col_yellow
 #' @importFrom dplyr filter
@@ -12,6 +13,7 @@
 #' @importFrom dplyr one_of
 #' @importFrom dplyr rename
 #' @importFrom dplyr select
+#' @importFrom ggplot2 coord_flip
 #' @importFrom ggplot2 element_blank
 #' @importFrom ggplot2 element_rect
 #' @importFrom ggplot2 element_text
@@ -19,12 +21,14 @@
 #' @importFrom ggplot2 geom_text
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 ggsave
+#' @importFrom ggplot2 guide_legend
 #' @importFrom ggplot2 guides
 #' @importFrom ggplot2 position_stack
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 theme_bw
 #' @importFrom grid unit
 #' @importFrom here here
+#' @importFrom stringr str_replace
 #' @importFrom utils write.csv2
 #' @export
 fn11_graphe_barres_lgt_type_territoire <- function(x = "aut") {
@@ -35,19 +39,19 @@ fn11_graphe_barres_lgt_type_territoire <- function(x = "aut") {
 
   # tab3 pour graphique à barre page 2
 
-  bilan %>%
-    dplyr::filter(!variable %in% "log", type %in% x) %>%
-    dplyr::left_join(df_codelgt, by = "variable") %>%
+  bilan |>
+    dplyr::filter(!variable %in% "log", type %in% x) |>
+    dplyr::left_join(df_codelgt, by = "variable") |>
     dplyr::select(dplyr::one_of(c(
       "type", "variable", "territoire", "libelle", "trim"
-    ))) %>%
-    dplyr::rename("nb" = "trim") %>%
-    dplyr::group_by(type, territoire) %>%
+    ))) |>
+    dplyr::rename("nb" = "trim") |>
+    dplyr::group_by(type, territoire) |>
     dplyr::mutate(
       nbcum = sum(nb),
       taux = round(nb / nbcum, digits = 3),
       label_y = 100 - (100 * cumsum(taux)),
-      tauxpc = paste0(round(taux * 100, digits = 1), "%") %>%
+      tauxpc = paste0(round(taux * 100, digits = 1), "%") |>
         stringr::str_replace("\\.", "\\,")
     ) -> tab3
 
@@ -77,7 +81,7 @@ fn11_graphe_barres_lgt_type_territoire <- function(x = "aut") {
       size = 3.5
     ) +
     ggplot2::scale_y_continuous(name = "Taux") +
-    ggplot2::scale_fill_manual(values = df_palettecouleur$pal_3col_2 %>% unlist() %>% unname()) +
+    ggplot2::scale_fill_manual(values = df_palettecouleur$pal_3col_2 |> unlist() |> unname()) +
     # ggplot2::scale_fill_manual(values = c("cadetblue3", "darkseagreen1", "gold")) +
     # coord_flip() +
     ggplot2::theme_bw() +

@@ -4,7 +4,8 @@ author: "G.Winterstein"
 date: "2023-08-11"
 params: 
   annee_mois: "202202"
-  modele_plaquette: "non"
+  modele_plaquette: "oui"
+  modele_nom: "SITADEL_Version_2024_03.sla"
 output: html_document
 ---
 
@@ -22,10 +23,31 @@ params
 
 ## Choix du modele de plaquette si choix_plaquette : "oui"
 
-Avant de relancer le script, depuis Scribus ou l'explorateur dde fichier : enregistrer une plaquette modifiée à la main dans 3_tables en la nommant modele_sitadel.sla
+Avant de relancer le script, depuis Scribus ou l'explorateur de fichier : enregistrer une plaquette modifiée à la main dans 3_tables en la nommant comme vous voulez.
 
-```{r}
-fn00_verifie_existe_modele()
+**ATTENTION : Pour que cela fonctionne, il faut créer la plaquette modèle à partir d'un fichier sla du répertoire résultats dans le même répertoire ex 202403 en créant une copie, la renommer autrement, sinon vous perdez tous les liens vers les images de la plaquette.**
+
+Où placer les nouvelles images en cas de remplacement :
+
+Comme les images, hors graphiques et cartes, s'affichent dans **toutes les plaquettes,** elles se trouvent dans **construction_neuve/4_resultats/00_logo** : logos, QR Code, dessin grue, photo d'illustration. Enregistrer l'image à la place de l'ancienne avec le même nom (en ayant sauvegardé ailleurs les anciennes images en cas de pb).
+
+Si besoin de copier sur un autre répertoire ailleurs, le lien vers les images permanentes sera à reconfigurer (mais est ce bien nécessaire?, il suffit de travailler sur le fichier renommé en \_T2 dans le répertoire résultats/anneemois et d'enregistrer le pdf ailleurs).
+
+ou
+
+-   créer un repertoire plaquette_sitadel (ou toto) à un autre emplacement (etudes_en_cours), avec les sous-répertoires suivants 
+
+    -   00_logo
+
+    -   ma_plaquette (ou tata)
+
+        -   images
+
+Placer les images dans images, tout ce qui est dans 00_logo dans logo et le fichier sla dans ma_plaquette et lancer scribus. Ca devrait fonctionner **sauf si vous utilisez des versions différentes de Scribus**.
+
+```{r modele_scribus}
+fn00_verifie_existe_modele()-> nom_modele
+
 ```
 
 ## Entrees (data)
@@ -41,94 +63,91 @@ fn01_cree_repertoires()
 Le mois dans params (parametres) doit correspondre avec un tableau du ROeS dans 2_data
 
 ```{r test_date}
-fn02_verifie_mois_valide()
+fn02_verifie_mois_valide() -> ls_dates
 ```
 
 ### Lit le fichier excel
 
--   lsm liste des onglets du tableau excel donnees brutes
+-   lsm liste des onglets du tableau excel données brutes
 
 ```{r data_raw}
-fn03_lit_tab_excel()-> lsm 
+fn03_lit_tab_excel() -> lsm 
 
 ```
 
 #### Cumul sur 12 mois arrondi ou pas
 
--   lsm_12m0 donnees cumulees sur 12 mois non arrondies (calcul des taux d evolution)
+-   lsm_12m0 données cumulées sur 12 mois non arrondies (calcul des taux d'évolution)
 
--   lsm_12m donnees cumulees sur 12 mois arrondies et recalees (affichage dans les tableaux)
+-   lsm_12m données cumulées sur 12 mois arrondies et recalées (affichage dans les tableaux)
 
 ```{r data_mod}
-fn04_modifie1_liste(lsm)-> lsm_12m0
-fn05_modifie2_liste(lsm_12m0)-> lsm_12m
+fn04_modifie1_liste(lsm) -> lsm_12m0
+fn05_modifie2_liste(lsm_12m0) -> lsm_12m
 ```
 
 ## Sorties (tableaux, illustrations)
 
 ### Graphique tous les logements par mois (non publiable)
 
-Donne une idee des volumes concernés a comparer avec le taux de remontee des informations si besoin (voir Joseph)
+Donne une idée des volumes concernés à comparer avec le taux de remontée des informations si besoin (voir Joseph)
 
 ```{r graph0}
-purrr::map(type_lgt, ~fn06_graphe_mensuel_np(.x))-> ls_graph
+purrr::map(type_lgt, ~fn06_graphe_mensuel_np(.x)) -> ls_graph
 ls_graph
 ```
 
 ### Graphique évolution par type tous les logements
 
 ```{r graph1}
-purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol(.x))-> ls_graph1
+purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol(.x)) -> ls_graph1
 ls_graph1
 ```
 
 ### Graphique surfacique évolution par type tous les logements
 
-```{r graph2}
-purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol_area(.x))-> ls_graph1b
+```{r graph1b}
+purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol_area(.x)) -> ls_graph1b
 ls_graph1b
 ```
-
 
 ### Tableau Bilan (doc travail)
 
 ```{r tab_travail}
-fn08_tableau_bilan()-> bilan
+fn08_tableau_bilan() -> bilan
 ```
 
 ### Tableau plaquette 1
 
 ```{r tab1}
-purrr::map(type_lgt, ~fn09_tableau_lgt_tous_territoire(.x))-> ls_tab1
+purrr::map(type_lgt, ~fn09_tableau_lgt_tous_territoire(.x)) -> ls_tab1
 ls_tab1
 ```
 
 ### Tableaux plaquette 2
 
 ```{r tab2}
-purrr::map(type_lgt, ~fn10_tableau_lgt_type(.x))-> ls_tab2
+purrr::map(type_lgt, ~fn10_tableau_lgt_type(.x)) -> ls_tab2
 ls_tab2
 ```
 
 ### Graphique part de chaque type de logements
 
 ```{r graph2}
-purrr::map(type_lgt, ~fn11_graphe_barres_lgt_type_territoire(.x))-> ls_graph2
+purrr::map(type_lgt, ~fn11_graphe_barres_lgt_type_territoire(.x)) -> ls_graph2
 ls_graph2
 ```
 
 ### Bonus1 evolution sur un an pour chaque type de logements
 
-trim : cumul de 12 mois à la date du dernier mois
-trim_b: cumul de 12 mois à la date du dernier mois - 1 an
+trim : cumul de 12 mois à la date du dernier mois trim_b: cumul de 12 mois à la date du dernier mois - 1 an
 
 ```{r bonus1}
 
-purrr::map(type_lgt, fn11_evol1an_type_lgt_bonus1)-> ls_bonus1
+purrr::map(type_lgt, fn11_evol1an_type_lgt_bonus1) -> ls_bonus1
 ```
 
 #### Logement autorisés
-
 
 ```{r, fig.dim=c(10,6)}
 ls_bonus1$Autorisés$tableau
@@ -136,9 +155,7 @@ ls_bonus1$Autorisés$tableau
 ls_bonus1$Autorisés$graphe
 ```
 
-
 #### Logements commencés
-
 
 ```{r, fig.dim=c(10,6)}
 ls_bonus1$Commencés$tableau
@@ -146,12 +163,9 @@ ls_bonus1$Commencés$tableau
 ls_bonus1$Commencés$graphe
 ```
 
-
-
 ### Bonus2 evolution sur un an pour tous les logements
 
-trim : cumul de 12 mois à la date du dernier mois
-trim_b: cumul de 12 mois à la date du dernier mois - 1 an
+trim : cumul de 12 mois à la date du dernier mois trim_b: cumul de 12 mois à la date du dernier mois - 1 an
 
 ```{r bonus2}
 
@@ -159,10 +173,7 @@ purrr::map(type_lgt, fn11_evol1an_type_lgt_bonus2) -> ls_bonus2
 
 ```
 
-
 #### Logements Autorisés
-
-
 
 ```{r, fig.dim=c(10,4)}
 
@@ -171,11 +182,7 @@ ls_bonus2$Autorisés$tableau
 ls_bonus2$Autorisés$graphe
 ```
 
-
-
 #### Logements commencés
-
-
 
 ```{r, fig.dim=c(10,4)}
 
@@ -184,11 +191,10 @@ ls_bonus2$Commencés$tableau
 ls_bonus2$Commencés$graphe
 ```
 
-
 ### Graphique comparaison en base 100 Corse et France metropolitaine
 
 ```{r graph3}
-purrr::map(type_lgt, ~fn12_graphe_lgt_tous_base100(.x))-> ls_graph3
+purrr::map(type_lgt, ~fn12_graphe_lgt_tous_base100(.x)) -> ls_graph3
 ls_graph3
 ```
 
@@ -202,7 +208,7 @@ graph4
 ### Cartographie
 
 ```{r carto}
-purrr::map(type_lgt, ~fn14_carte_region_lgt_tous_evolution(.x))-> ls_carte1
+purrr::map(type_lgt, ~fn14_carte_region_lgt_tous_evolution(.x)) -> ls_carte1
 ls_carte1
 ```
 
@@ -213,7 +219,7 @@ purrr::walk(type_lgt, ~fn15_enregistre_tab_4serveur(.x))
 
 ```
 
-### Recapitulatif tableaux plaquette
+### Récapitulatif tableaux plaquette
 
 ```{r }
 ls_tab <- list("tab1" = ls_tab1[[1]],
@@ -229,18 +235,16 @@ ls_tab <- list("tab1" = ls_tab1[[1]],
 ### lit le modele de plaquette
 
 ```{r lit_modele}
-fn16_lit_le_modele_sla()-> ls_modele
+fn16_lit_le_modele_sla() -> ls_modele
+
 ```
 
 ### Actualise son contenu
 
 ```{r actualise_modele}
 fn17_modifie_objet_by_id_newvalue()
-fn18_tableaux_cellule_a_remplacer()-> toto
-fn19_tableaux_remplace_corps_tableau()
+fn18_maj_tableaux() -> toto
 fn20_actualise_date_titre(x = params$annee_mois)
 fn21_tableaux_met_en_forme_2ndeligne()
 
 ```
-
-
