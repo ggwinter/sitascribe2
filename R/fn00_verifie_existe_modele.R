@@ -1,5 +1,7 @@
 #' fn00_verifie_existe_modele
 #'
+#' Verifie que si modele_plaquette est oui le fichier sla est bien dans 3_tables
+#'
 #' @param x character oui ou non
 #'
 #' @return chemin vers le modele

@@ -13,5 +13,5 @@ fn12_graphe_lgt_tous_base100(x = "aut")
 graphe
 }
 \description{
-fn12_graphe_lgt_tous_base100
+Comparaison en base 100 tous logements Corse et France métro. Pages 2 et 3
 }

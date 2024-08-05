@@ -13,5 +13,6 @@ fn11_graphe_barres_lgt_type_territoire(x = "aut")
 graphique
 }
 \description{
-fn11_graphe_barres_lgt_type_territoire
+Graphiques à barre, composition des nouveaux logements par typologie
+par territoire. Voir page 2 et 3
 }

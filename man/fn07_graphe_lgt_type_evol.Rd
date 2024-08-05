@@ -13,5 +13,5 @@ fn07_graphe_lgt_type_evol(x = "aut")
 graphe
 }
 \description{
-fn07_graphe_lgt_type_evol
+Graphique par types de logements autorises page 2, commences  non publie
 }

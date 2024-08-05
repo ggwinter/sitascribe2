@@ -1,5 +1,7 @@
 #' fn12_graphe_lgt_tous_base100
 #'
+#' Comparaison en base 100 tous logements Corse et France métro. Pages 2 et 3
+#'
 #' @param x caractere aut ou com
 #'
 #' @return graphe
@@ -39,7 +41,7 @@ fn12_graphe_lgt_tous_base100 <- function(x = "aut") {
 
   limite <- as.character(as.numeric(params$annee_mois) - 1000)
 
-  lsm_12m0$FR |>
+  lsm_12m0$FRM |>
     dplyr::select(type, territoire, date, log) |>
     dplyr::filter(date >= limite, type %in% x, stats::complete.cases(log)) -> b100_frm
 
@@ -76,8 +78,8 @@ fn12_graphe_lgt_tous_base100 <- function(x = "aut") {
 
 
 
-  # rm(b100_frm, b100_cor)
-  #
+  rm(b100_frm, b100_cor)
+
   b100_frmcor$b100_log |>
     range() |>
     (\(.) round(., -1))() -> val_range
@@ -103,7 +105,7 @@ fn12_graphe_lgt_tous_base100 <- function(x = "aut") {
     ggplot2::geom_hline(yintercept = 100, color = "grey60") +
     ggplot2::geom_line(ggplot2::aes(linetype = territoire, color = territoire),
                        linewidth = 1.1) +
-    ggplot2::scale_colour_manual(values = df_palettecouleur$pal_2col |> unlist() |> unname()) +
+    ggplot2::scale_colour_manual(values = unname(df_palettecouleur$pal_2col)) +
     ggplot2::scale_linetype_manual(values = c("twodash", "solid")) +
     ggplot2::scale_x_date(labels = scales::date_format("%Y-%m"),
                           breaks = graduation) +
@@ -129,6 +131,7 @@ fn12_graphe_lgt_tous_base100 <- function(x = "aut") {
       legend.background = ggplot2::element_rect(fill = "transparent"),
       legend.key = ggplot2::element_rect(fill = "transparent",
                                          color = "transparent"),
+      legend.position = "inside",
       legend.position.inside = c(0.25, 0),
       legend.justification.inside = c(1.2, 0)
     ) +
@@ -143,6 +146,7 @@ fn12_graphe_lgt_tous_base100 <- function(x = "aut") {
                params$annee_mois,
                "images",
                paste0("b100_frmcor_", x, ".png"))
+
   ggplot2::ggsave(
     filename,
     width = 19.36,

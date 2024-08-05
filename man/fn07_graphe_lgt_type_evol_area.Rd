@@ -10,8 +10,10 @@ fn07_graphe_lgt_type_evol_area(x = "aut")
 \item{x}{character aut ou com}
 }
 \value{
-graphe
+graphe surfacique evolution par type pour la Corse
 }
 \description{
-Affiche un graphe surfacique
+Une fois l analyse realisee via run all chunk
+la fonction permet de creer, si besoin, un graphe
+surfacique a la place des courbes.
 }

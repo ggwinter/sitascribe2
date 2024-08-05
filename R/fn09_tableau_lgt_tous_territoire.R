@@ -3,6 +3,9 @@
 #' @param x caractere aut ou com
 #'
 #' @return dataframe
+#' @importFrom attempt stop_if
+#' @importFrom cli bg_red
+#' @importFrom cli col_yellow
 #' @importFrom dplyr across
 #' @importFrom dplyr arrange
 #' @importFrom dplyr bind_rows
@@ -18,27 +21,32 @@
 #' @importFrom stringr str_replace
 #' @export
 fn09_tableau_lgt_tous_territoire <- function(x = "aut") {
-  # tableau 1 - page 1
+  attempt::stop_if(.x = x,
+                   .p = ~!is.character(.x),
+                   msg = cli::bg_red(cli::col_yellow("x doit etre au format caractere")))
+  attempt::stop_if(.x = x,
+                   .p = ~!.x %in% c("aut", "com"),
+                   msg = cli::bg_red(cli::col_yellow("aut ou com uniquement")))
 
   tab1 <- bilan |>
-    dplyr::filter(variable %in% "log", type %in% x) |>
+    dplyr::filter(variable %in% "log", type %in% x, geo != 0) |>
     dplyr::select(type,
                   geo,
                   variable,
                   territoire,
                   value,
-                  diff_trim,
-                  diff_trim1,
-                  diff_trim2) |>
+                  evol_trim,
+                  evol_trim1,
+                  evol_trim2) |>
     dplyr::arrange(dplyr::desc(geo)) |>
     dplyr::select(-geo) |>
     purrr::set_names("type",
                      "variable",
                      "territoire",
                      "nombre",
-                     "diff_trim",
-                     "diff_trim1",
-                     "diff_trim2")
+                     "evol_trim",
+                     "evol_trim1",
+                     "evol_trim2")
 
 
   filename <- here::here("4_resultats", params$annee_mois, "tableaux", paste0("tab1_", x, ".csv"))
@@ -53,11 +61,11 @@ fn09_tableau_lgt_tous_territoire <- function(x = "aut") {
     dplyr::pull("moislibl")
   liste_mois_lib <- paste("fin", liste_mois_lib[c(3, 2, 1)])
 
-  pl_tab1 <- tab1 |> dplyr::select(territoire:diff_trim2)
+  pl_tab1 <- tab1 |> dplyr::select(territoire:evol_trim2)
   # rm(tab1_aut)
 
 
-  # AUT inserer le controle sur la somme des deux départements !!!!! ---------------
+  # inserer le controle sur la somme des deux départements
 
   eff <- pl_tab1[1, 2] + pl_tab1[2, 2]
   if (eff < pl_tab1[3, 2]) {
@@ -78,7 +86,7 @@ fn09_tableau_lgt_tous_territoire <- function(x = "aut") {
                                   big.mark = " ")) |>
     dplyr::mutate(
       dplyr::across(
-        dplyr::contains("diff"),
+        dplyr::contains("evol"),
         ~ paste0(.x * 100, "%") |> stringr::str_replace("\\.", ",")
       ),
       territoire = as.character(territoire)

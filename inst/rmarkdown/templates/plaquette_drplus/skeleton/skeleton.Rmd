@@ -3,7 +3,7 @@ title: "Plaquette Sitadel"
 author: "G.Winterstein"
 date: "2023-08-11"
 params: 
-  annee_mois: "202202"
+  annee_mois: "202403"
   modele_plaquette: "oui"
   modele_nom: "SITADEL_Version_2024_03.sla"
 output: html_document
@@ -13,6 +13,7 @@ output: html_document
 knitr::opts_chunk$set(echo = FALSE)
 library(sitascribe2)
 type_lgt <- c("Autorisés" = "aut", "Commencés" = "com")
+
 ```
 
 ## Récapitulatif des paramètres choisis
@@ -29,21 +30,7 @@ Avant de relancer le script, depuis Scribus ou l'explorateur de fichier : enregi
 
 Où placer les nouvelles images en cas de remplacement :
 
-Comme les images, hors graphiques et cartes, s'affichent dans **toutes les plaquettes,** elles se trouvent dans **construction_neuve/4_resultats/00_logo** : logos, QR Code, dessin grue, photo d'illustration. Enregistrer l'image à la place de l'ancienne avec le même nom (en ayant sauvegardé ailleurs les anciennes images en cas de pb).
-
-Si besoin de copier sur un autre répertoire ailleurs, le lien vers les images permanentes sera à reconfigurer (mais est ce bien nécessaire?, il suffit de travailler sur le fichier renommé en \_T2 dans le répertoire résultats/anneemois et d'enregistrer le pdf ailleurs).
-
-ou
-
--   créer un repertoire plaquette_sitadel (ou toto) à un autre emplacement (etudes_en_cours), avec les sous-répertoires suivants 
-
-    -   00_logo
-
-    -   ma_plaquette (ou tata)
-
-        -   images
-
-Placer les images dans images, tout ce qui est dans 00_logo dans logo et le fichier sla dans ma_plaquette et lancer scribus. Ca devrait fonctionner **sauf si vous utilisez des versions différentes de Scribus**.
+Comme les images, hors graphiques et cartes, s'affichent dans **toutes les plaquettes**, elles se trouvent dans **construction_neuve/4_resultats/00_logo** : logos, QR Code, dessin grue, photo d'illustration. Enregistrer l'image à la place de l'ancienne avec le même nom (en ayant sauvegardé ailleurs les anciennes images en cas de pb). Dans le cas d'une nouvelle image lui donner un nom compréhensible.
 
 ```{r modele_scribus}
 fn00_verifie_existe_modele()-> nom_modele
@@ -88,28 +75,22 @@ fn05_modifie2_liste(lsm_12m0) -> lsm_12m
 
 ## Sorties (tableaux, illustrations)
 
-### Graphique tous les logements par mois (non publiable)
+### Graphique tous les logements par mois
 
-Donne une idée des volumes concernés à comparer avec le taux de remontée des informations si besoin (voir Joseph)
+Non utilisé dans la plaquette mais donne une idée des évolutions mensuelles.
 
 ```{r graph0}
 purrr::map(type_lgt, ~fn06_graphe_mensuel_np(.x)) -> ls_graph
 ls_graph
 ```
 
-### Graphique évolution par type tous les logements
+### Graphique évolution par type pour tous les logements
 
 ```{r graph1}
 purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol(.x)) -> ls_graph1
 ls_graph1
 ```
 
-### Graphique surfacique évolution par type tous les logements
-
-```{r graph1b}
-purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol_area(.x)) -> ls_graph1b
-ls_graph1b
-```
 
 ### Tableau Bilan (doc travail)
 
@@ -138,59 +119,6 @@ purrr::map(type_lgt, ~fn11_graphe_barres_lgt_type_territoire(.x)) -> ls_graph2
 ls_graph2
 ```
 
-### Bonus1 evolution sur un an pour chaque type de logements
-
-trim : cumul de 12 mois à la date du dernier mois trim_b: cumul de 12 mois à la date du dernier mois - 1 an
-
-```{r bonus1}
-
-purrr::map(type_lgt, fn11_evol1an_type_lgt_bonus1) -> ls_bonus1
-```
-
-#### Logement autorisés
-
-```{r, fig.dim=c(10,6)}
-ls_bonus1$Autorisés$tableau
-
-ls_bonus1$Autorisés$graphe
-```
-
-#### Logements commencés
-
-```{r, fig.dim=c(10,6)}
-ls_bonus1$Commencés$tableau
-
-ls_bonus1$Commencés$graphe
-```
-
-### Bonus2 evolution sur un an pour tous les logements
-
-trim : cumul de 12 mois à la date du dernier mois trim_b: cumul de 12 mois à la date du dernier mois - 1 an
-
-```{r bonus2}
-
-purrr::map(type_lgt, fn11_evol1an_type_lgt_bonus2) -> ls_bonus2
-
-```
-
-#### Logements Autorisés
-
-```{r, fig.dim=c(10,4)}
-
-ls_bonus2$Autorisés$tableau
-
-ls_bonus2$Autorisés$graphe
-```
-
-#### Logements commencés
-
-```{r, fig.dim=c(10,4)}
-
-ls_bonus2$Commencés$tableau
-
-ls_bonus2$Commencés$graphe
-```
-
 ### Graphique comparaison en base 100 Corse et France metropolitaine
 
 ```{r graph3}
@@ -205,12 +133,26 @@ fn13_graphe_lgt_tous_autcom_dep()-> graph4
 graph4
 ```
 
-### Cartographie
+### Cartographie{.tabset}
 
-```{r carto}
+```{r carto, echo=FALSE}
 purrr::map(type_lgt, ~fn14_carte_region_lgt_tous_evolution(.x)) -> ls_carte1
-ls_carte1
 ```
+
+#### Logements autorisés
+
+```{r carto_aut, echo=FALSE}
+ls_carte1$Autorisés
+```
+
+
+#### Logements commencés
+
+```{r carto_com, echo=FALSE}
+ls_carte1$Commencés
+```
+
+#### {-}
 
 ### Export data pour serveur
 

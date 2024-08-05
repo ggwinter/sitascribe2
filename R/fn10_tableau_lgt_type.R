@@ -32,22 +32,18 @@ fn10_tableau_lgt_type <- function(x = "toto") {
   attempt::stop_if(
     .x = x,
     .p = ~ !.x %in% c("aut", "com"),
-    msg = cli::bg_red(cli::col_yellow("aut ou com uniquement"))
+    msg = cli::bg_red(cli::col_yellow("toto uniquement"))
   )
 
   tab2_12m <- bilan |>
     dplyr::filter(territoire %in% c("Corse", "France m\u00e9tro."), type %in% x) |>
     dplyr::select(dplyr::one_of(c(
-      "type",
-      "variable",
-      "territoire",
-      "value",
-      "diff_trim"
+      "type", "variable", "territoire", "value", "evol_trim"
     )))
 
   tab2 <- tab2_12m |>
     dplyr::filter(territoire %in% "Corse") |>
-    dplyr::mutate(Evolution_FRm = tab2_12m$diff_trim[!tab2_12m$territoire %in% "Corse"])
+    dplyr::mutate(Evolution_FRm = tab2_12m$evol_trim[!tab2_12m$territoire %in% "Corse"])
 
   # rm(tab2_12m)
   filename <-
@@ -55,18 +51,17 @@ fn10_tableau_lgt_type <- function(x = "toto") {
                params$annee_mois,
                "tableaux",
                paste0("tab2_", x, ".csv"))
-  utils::write.csv2(tab2, filename,
-                    row.names = FALSE)
+  utils::write.csv2(tab2, filename, row.names = FALSE)
 
   # Mise en forme pour publication
 
   pl_tab2 <-
     tab2 |>
     dplyr::select(dplyr::one_of(c(
-      "variable", "value", "diff_trim", "Evolution_FRm"
+      "variable", "value", "evol_trim", "Evolution_FRm"
     ))) |>
     dplyr::left_join(df_codelgt, by = "variable") |>
-    dplyr::select(libelle, value, diff_trim, Evolution_FRm) |>
+    dplyr::select(libelle, value, evol_trim, Evolution_FRm) |>
     purrr::set_names(c("Logements", "Nombre", "Evolution", "Evolution FRm"))
 
 
@@ -85,9 +80,7 @@ fn10_tableau_lgt_type <- function(x = "toto") {
 
   pl_tab2 |>
     dplyr::mutate(
-      "Nombre" = format(Nombre,
-                      decimal.mark = ",",
-                      big.mark = " "),
+      "Nombre" = format(Nombre, decimal.mark = ",", big.mark = " "),
       "Logements" = as.character(Logements)
     ) |>
     dplyr::mutate(dplyr::across(
@@ -105,7 +98,8 @@ fn10_tableau_lgt_type <- function(x = "toto") {
         df[1, i] <- x[i]
       return(df)
     }
-  fn_dfg(eff, c(NA_character_, NA_character_, "Corse", "France m\u00e9tro.")) -> eff
+  fn_dfg(eff,
+         c(NA_character_, NA_character_, "Corse", "France m\u00e9tro.")) -> eff
   pl_tab2 <- eff |> dplyr::bind_rows(pl_tab2)
 
   filename <-
@@ -113,7 +107,6 @@ fn10_tableau_lgt_type <- function(x = "toto") {
                params$annee_mois,
                "tableaux",
                paste0("pl_tab2_", x, ".csv"))
-  utils::write.csv2(pl_tab2, filename,
-                    row.names = FALSE)
+  utils::write.csv2(pl_tab2, filename, row.names = FALSE)
   return(pl_tab2)
 }

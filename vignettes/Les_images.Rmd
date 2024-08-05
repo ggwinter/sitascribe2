@@ -1,0 +1,38 @@
+---
+title: "Les images"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Les_images}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(sitascribe2)
+```
+
+## A propos des images et de Scribus
+
+La définition est le nombre de points (ou pixels) que comporte une image numérique en largeur et en hauteur (le nombre de colonnes et nombre de lignes). (=taille en pixels)
+
+La résolution d'une image est le nombre de pixels contenus dans l'image par unité de longueur. Elle s'exprime le plus souvent en ppp (point par pouces) ou en dpi (dots per inch), parfois en point par cm.
+
+Rappel : 1 pouce (ou inch) = 2,54 cm.
+
+La résolution définit la netteté et la qualité d'une image. Plus la résolution est grande (c'est-à-dire plus il y a de pixels dans une longueur de 1 pouce), plus votre image est précise dans les détails
+
+Scribus nécessite des images de résolution supérieure à 144 dpi, dans la pratique il vaut mieux passer à 300 dpi (minimum pour l'impression proféssionnelle).
+
+## En pratique
+
+### Remplacer une image, un logo ou un graphique
+
+-   Il faut enregister une image au format png (de préférence) qui porte le [même nom]{.underline} que celle à remplacer dans le [même]{.underline} répertoire.
+
+-   Pour que cela fonctionne dans Scribus sans rien modifier, il faut absolument que les deux images aient les **mêmes dimensions**.
+
+### 

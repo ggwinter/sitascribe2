@@ -3,6 +3,7 @@
 #' @param x caractere aut ou com
 #'
 #' @return graphique
+#' @importFrom attempt stop_if
 #' @importFrom cli bg_red
 #' @importFrom cli col_yellow
 #' @importFrom dplyr filter
@@ -40,7 +41,7 @@ fn14_carte_region_lgt_tous_evolution <- function(x = "aut") {
   # cartographie -
 
   # Theme sans quadrillage pour la cartographie
-  '%+replace%'<- ggplot2::'%+replace%'
+  '%+replace%' <- ggplot2::'%+replace%'
   theme_clean <- function(base_size = 12) {
     ggplot2::theme_grey(base_size) %+replace%
       ggplot2::theme(
@@ -64,15 +65,24 @@ fn14_carte_region_lgt_tous_evolution <- function(x = "aut") {
 
 
   sit_drp_regfrm <- lsm_12m0$NEW_REG |>
-    dplyr::filter(terr_cd > 10, type %in% x, date %in% c(params$annee_mois, ls_dates$liste_mois[2])) |>
+    dplyr::filter(terr_cd > 10,
+                  type %in% x,
+                  date %in% c(params$annee_mois, ls_dates$liste_mois[2])) |>
     dplyr::ungroup() |>
-    dplyr::select(dplyr::one_of(c("type", "terr_cd", "territoire", "date", "log"))) |>
-    tidyr::pivot_wider(names_from = date,
-                       values_from = log) |>
+    dplyr::select(dplyr::one_of(c(
+      "type", "terr_cd", "territoire", "date", "log"
+    ))) |>
+    tidyr::pivot_wider(names_from = date, values_from = log) |>
     purrr::set_names("type", "terr_cd", "territoire", "an_prec", "an") |>
-    dplyr::mutate(diff = round((an - an_prec) / an_prec, digits = 3))
+    dplyr::mutate(
+      nb_lgt = round(an, -2),
+      tx_evol = round((an - an_prec) / an_prec, digits = 3),
+      rg_nb_lgt = 14 - round(rank(an, ties.method = "average")),
+      rg_tx_evol = 14 - round(rank(tx_evol, ties.method = "average"))
+    ) |>
+    dplyr::select(type:territoire, nb_lgt, rg_nb_lgt, tx_evol, rg_tx_evol, an, an_prec)
 
-  sit_drp_regfrm |> dplyr::pull(diff) -> liste_valeurs_diff
+  sit_drp_regfrm |> dplyr::pull(tx_evol) -> liste_valeurs_diff
 
   range(liste_valeurs_diff) -> range_valeurs_diff
   floor(10 * range_valeurs_diff[1]) / 10 -> val_min
@@ -94,7 +104,7 @@ fn14_carte_region_lgt_tous_evolution <- function(x = "aut") {
         size = length(echelle_range),
         replace = FALSE
       ),
-      "diff" = sample(
+      "tx_evol" = sample(
         echelle_range,
         size = length(echelle_range),
         replace = FALSE
@@ -105,9 +115,10 @@ fn14_carte_region_lgt_tous_evolution <- function(x = "aut") {
     map_regshp |> dplyr::left_join(sit_drp_regfrm,
                                    by = c("INSEE_REG" = "terr_cd"))
 
-  p <- ggplot2::ggplot(map_reg, ggplot2::aes(fill = diff)) +
+  p <- ggplot2::ggplot(map_reg, ggplot2::aes(fill = tx_evol)) +
     ggplot2::geom_sf(lwd = 1, colour = "grey90") + # , colour = "red"
-    ggplot2::geom_point(data = map_bidon, ggplot2::aes(x = x, y = y), alpha = 0) +
+    ggplot2::geom_point(data = map_bidon,
+                        ggplot2::aes(x = x, y = y), alpha = 0) +
     ggplot2::scale_fill_gradient2(
       low = "red",
       mid = "white",
@@ -124,19 +135,18 @@ fn14_carte_region_lgt_tous_evolution <- function(x = "aut") {
       legend.text = ggplot2::element_text(size = 9),
       legend.background = ggplot2::element_rect(fill = "transparent",
                                                 color = "transparent"),
-      #
       legend.key = ggplot2::element_rect(
         fill = "transparent",
         color = "transparent",
-        size = 2
+        linewidth = 2
       ),
-      legend.position = c(0.92, 0.60),
+      legend.position.inside = c(0.92, 0.60),
       # legend.justification = c(1.2, 0),
       legend.key.size = grid::unit(0.4, "cm")
     )
 
 
-  p + ggplot2::geom_sf_text(ggplot2::aes(label = format(round(diff * 100, 2), decimal.mark = ",")), size = 3.6) +
+  p + ggplot2::geom_sf_text(ggplot2::aes(label = format(round(tx_evol * 100, 2), decimal.mark = ",")), size = 3.6) +
     ggplot2::guides(fill = ggplot2::guide_legend(
       override.aes = list(size = 4, colour = "transparent", lwd = 0),
       reverse = TRUE
@@ -154,7 +164,20 @@ fn14_carte_region_lgt_tous_evolution <- function(x = "aut") {
   )
 
   rm(map_reg)
-  return(p)
+
+
+  ls_result <-
+    list(
+      "tableau" = DT::datatable(
+        sit_drp_regfrm[,3:8],
+        extensions = 'Buttons',
+        options = list(dom = 'Bfrtip',
+                       buttons = c('copy', 'csv', 'excel'))
+      ),
+      "carte" = p
+    )
+
+
+  return(ls_result)
 
 }
-

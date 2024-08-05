@@ -13,5 +13,5 @@ fn08_tableau_bilan(x = "aut")
 dataframe
 }
 \description{
-fn08_tableau_bilan
+Creation du tableau bilan utilisable comme document de travail
 }

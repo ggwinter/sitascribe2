@@ -13,5 +13,7 @@ fn11_evol1an_type_lgt_bonus2(x = "aut")
 liste
 }
 \description{
-Analyse evolution sur un an pour tous les logements
+Une fois l analyse realisee via run all chunk
+la fonction permet de creer si besoin un graphe interactif
+pour aider a la redaction. Analyse sur 12 mois.
 }

@@ -1,9 +1,14 @@
 #' fn11_evol1an_type_lgt_bonus1
 #'
-#' Analyse evolution sur un an par type de logement
+#' Une fois l analyse realisee via run all chunk
+#' la fonction permet de creer si besoin un graphe interactif
+#' pour aider a la redaction.
 #'
 #' @param x caractere aut ou com
 #'
+#' @importFrom attempt stop_if
+#' @importFrom cli bg_red
+#' @importFrom cli col_yellow
 #' @importFrom dplyr filter
 #' @importFrom dplyr inner_join
 #' @importFrom dplyr join_by
@@ -26,16 +31,19 @@
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr pivot_wider
 #'
-#' @return liste
+#' @return liste des graphiques et tableaux pour les logements autorises et commences
 #' @export
 #'
 fn11_evol1an_type_lgt_bonus1 <- function(x = "aut") {
+
+  attempt::stop_if(.x = x, .p = ~ !is.character(.x), msg = cli::bg_red(cli::col_yellow("x doit etre au format caractere")))
+  attempt::stop_if(.x = x, .p = ~ !.x %in% c("aut", "com"), msg = cli::bg_red(cli::col_yellow("aut ou com uniquement")))
+
   tab3b <- bilan |>
     dplyr::filter(!variable %in% "log", type %in% x) |>
     dplyr::left_join(df_codelgt, by = "variable") |>
     dplyr::select(dplyr::one_of(c(
-      "type", "territoire",
-      "libelle", "trim", "trim_b"
+      "type", "geo", "territoire", "libelle", "trim", "trim_b"
     ))) |>
     tidyr::pivot_longer(
       cols = -c(type:libelle),
@@ -46,17 +54,14 @@ fn11_evol1an_type_lgt_bonus1 <- function(x = "aut") {
   tab3c <- bilan |>
     dplyr::filter(variable %in% "log", type %in% x) |>
     dplyr::left_join(df_codelgt, by = "variable") |>
-    dplyr::select(dplyr::one_of(c(
-      "type", "territoire",
-      "trim", "trim_b"
-    ))) |>
+    dplyr::select(dplyr::one_of(c("type", "geo", "territoire", "trim", "trim_b"))) |>
     tidyr::pivot_longer(
       cols = -c(type:territoire),
       names_to = "trimestre",
       values_to = "nombrec"
     )
-  dplyr::inner_join(tab3b, tab3c,by = dplyr::join_by(type, territoire, trimestre)) |>
-    dplyr::mutate(part = 100 * round(nombre / nombrec, digits = 3))-> tab3b
+  dplyr::inner_join(tab3b, tab3c, by = dplyr::join_by(type, geo, territoire, trimestre)) |>
+    dplyr::mutate(part = 100 * round(nombre / nombrec, digits = 3)) -> tab3b
 
   rm(tab3c)
   tab3b |>
@@ -70,10 +75,14 @@ fn11_evol1an_type_lgt_bonus1 <- function(x = "aut") {
     dplyr::mutate(
       diff = round(trim - trim_b, 1),
       taux = 100 * round(diff / trim_b, 3),
-      evolution = ifelse(taux > 0, "hausse", "baisse")
+      evolution = ifelse(taux > 0, "hausse", "baisse"),
+      taux = dplyr::case_when(indicateur == "nombre"~taux,
+                              TRUE~NA),
+      trim = round(trim, 1),
+      trim_b = round(trim_b, 1)
     ) -> tab3b
 
-  ggplot2::ggplot(tab3b |> dplyr::filter(!territoire %in% "France m\u00e9tro.")) +
+  ggplot2::ggplot(tab3b |> dplyr::filter(geo >= 2)) +
     ggplot2::geom_segment(ggplot2::aes(
       x = libelle,
       xend = libelle,
@@ -86,7 +95,7 @@ fn11_evol1an_type_lgt_bonus1 <- function(x = "aut") {
     ggplot2::geom_point(ggplot2::aes(x = libelle, y = trim), color = "red") +
     ggplot2::coord_flip() +
     ggplot2::theme_minimal() +
-    ggplot2::facet_wrap(territoire~indicateur, scales= "free_x", ncol = 2) +
+    ggplot2::facet_wrap(territoire ~ indicateur, scales = "free_x", ncol = 2) +
     ggplot2::theme(legend.position = "none") +
     ggplot2::labs(
       title = "Evolution sur un an par type de logements",
@@ -110,14 +119,13 @@ fn11_evol1an_type_lgt_bonus1 <- function(x = "aut") {
     unit = "cm",
     dpi = 300
   )
-  plotly::ggplotly(p)-> p
+  plotly::ggplotly(p) -> p
   ls_result <-
     list(
       "tableau" = DT::datatable(
         tab3b,
         extensions = 'Buttons',
-        options = list(dom = 'Bfrtip',
-                       buttons = c('copy', 'csv', 'excel'))
+        options = list(dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel'))
       ),
       "graphe" = p
     )

@@ -10,8 +10,8 @@ fn13_graphe_lgt_tous_autcom_dep(data = lsm_12m0$DPT)
 \item{data}{liste}
 }
 \value{
-nothing
+Graphique
 }
 \description{
-fn13_graphe_lgt_tous_autcom_dep
+Graphique de la page 4, 2A et 2B commences autorises sur le même tableau
 }

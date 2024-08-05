@@ -1,5 +1,8 @@
 #' fn11_graphe_barres_lgt_type_territoire
 #'
+#' Graphiques à barre, composition des nouveaux logements par typologie
+#' par territoire. Voir page 2 et 3
+#'
 #' @param x caractere aut ou com
 #'
 #' @return graphique
@@ -40,7 +43,7 @@ fn11_graphe_barres_lgt_type_territoire <- function(x = "aut") {
   # tab3 pour graphique à barre page 2
 
   bilan |>
-    dplyr::filter(!variable %in% "log", type %in% x) |>
+    dplyr::filter(!variable %in% "log", type %in% x, geo != 0) |>
     dplyr::left_join(df_codelgt, by = "variable") |>
     dplyr::select(dplyr::one_of(c(
       "type", "variable", "territoire", "libelle", "trim"
@@ -64,7 +67,7 @@ fn11_graphe_barres_lgt_type_territoire <- function(x = "aut") {
     )
 
   utils::write.csv2(tab3, filename,
-    row.names = FALSE
+                    row.names = FALSE
   )
 
   # graphe
@@ -81,9 +84,7 @@ fn11_graphe_barres_lgt_type_territoire <- function(x = "aut") {
       size = 3.5
     ) +
     ggplot2::scale_y_continuous(name = "Taux") +
-    ggplot2::scale_fill_manual(values = df_palettecouleur$pal_3col_2 |> unlist() |> unname()) +
-    # ggplot2::scale_fill_manual(values = c("cadetblue3", "darkseagreen1", "gold")) +
-    # coord_flip() +
+    ggplot2::scale_fill_manual(values = unname(df_palettecouleur$pal_3col_2)) +
     ggplot2::theme_bw() +
     ggplot2::theme(
       axis.text.x = ggplot2::element_text(
@@ -91,15 +92,11 @@ fn11_graphe_barres_lgt_type_territoire <- function(x = "aut") {
         hjust = 0.4,
         vjust = 0.5
       ),
-      # reglage des legendes des graduations de x
       axis.title.x = ggplot2::element_blank(),
-      # reglage de la legende du titre de de x (designe par name)
       axis.text.y = ggplot2::element_text(size = 9),
       axis.title.y = ggplot2::element_blank(),
-      # legend.title = ggplot2::element_text(size = 1, color = "white"),
       legend.title = ggplot2::element_blank(),
       legend.text = ggplot2::element_text(size = 9),
-      # ,face="bold"),
       legend.background = ggplot2::element_rect(fill = "transparent"),
       legend.key = ggplot2::element_rect(
         fill = "transparent",

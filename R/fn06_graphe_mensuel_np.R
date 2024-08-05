@@ -29,7 +29,7 @@ fn06_graphe_mensuel_np <- function(x = "aut") {
     .x = x,
     .p = ~ !.x %in% c("aut", "com"),
     msg = cli::bg_red(cli::col_yellow(
-      "x doit \u00eatre \u00e9gal \u00e0 aut ou com"
+      "aut ou com uniquement"
     ))
   )
   # graphique mensuel

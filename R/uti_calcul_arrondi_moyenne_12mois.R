@@ -1,5 +1,9 @@
 #' uti_calcul_arrondi_moyenne_12mois
 #'
+#' Compare la valeur arrondie a 100 du tous logements a la somme des valeurs
+#' arrondies par type si c'est superieur a 0 on ajoute arbitrairement 50
+#' logements a ip et colres,  methodologie locale non officielle.
+#'
 #' @param data df
 #'
 #' @return df

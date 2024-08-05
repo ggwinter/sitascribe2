@@ -1,8 +1,11 @@
 #' fn07_graphe_lgt_type_evol
 #'
+#' Graphique par types de logements autorises page 2, commences  non publie
+#'
 #' @param x caractere aut ou com
 #'
 #' @return graphe
+#' @importFrom attempt stop_if
 #' @importFrom cli bg_red
 #' @importFrom cli col_yellow
 #' @importFrom dplyr filter
@@ -29,7 +32,7 @@ fn07_graphe_lgt_type_evol <- function(x = "aut") {
                    msg = cli::bg_red(cli::col_yellow("x doit etre au format caractere")))
   attempt::stop_if(.x = x,
                    .p = ~!.x %in% c("aut", "com"),
-                   msg = cli::bg_red(cli::col_yellow("x doit etre eagl a aut ou com")))
+                   msg = cli::bg_red(cli::col_yellow("aut ou com uniquement")))
 
   # graphique
   #
@@ -63,8 +66,6 @@ fn07_graphe_lgt_type_evol <- function(x = "aut") {
                     colour = type
                   )) +
     ggplot2::geom_line(size = 1.2) +
-    # scale_x_date(labels = date_format("%Y-%m"),
-    #              breaks = graduation) +
     ggplot2::scale_y_continuous(
       name = "Nombre de logements",
       limits = c(0, val_max),
@@ -72,7 +73,7 @@ fn07_graphe_lgt_type_evol <- function(x = "aut") {
       labels = scales::label_number(big.mark = " ")
     ) +
     ggplot2::scale_colour_manual(
-      values = df_palettecouleur$pal_4col |> unlist() |> unname(),
+      values = unname(df_palettecouleur$pal_4col),
       labels = c(
         "Total",
         "Indiv. pur",
@@ -88,9 +89,7 @@ fn07_graphe_lgt_type_evol <- function(x = "aut") {
         hjust = 1,
         vjust = 0
       ),
-      # reglage des legendes des graduations de x
       axis.title.x = ggplot2::element_text(size = 8, colour = "white"),
-      # reglage de la legende du titre de de x (designe par name)
       axis.text.y = ggplot2::element_text(size = 10),
       axis.title.y = ggplot2::element_text(size = 11),
       plot.title = ggplot2::element_text(size = 14, face = "bold"),

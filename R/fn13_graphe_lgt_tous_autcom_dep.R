@@ -1,8 +1,10 @@
 #' fn13_graphe_lgt_tous_autcom_dep
 #'
+#' Graphique de la page 4, 2A et 2B commences autorises sur le même tableau
+#'
 #' @param data liste
 #'
-#' @return nothing
+#' @return Graphique
 #' @importFrom dplyr case_when
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
@@ -76,20 +78,17 @@ fn13_graphe_lgt_tous_autcom_dep <- function(data = lsm_12m0$DPT) {
         hjust = 1,
         vjust = 0
       ),
-      # reglage des legendes des graduations de x
       axis.title.x = ggplot2::element_text(size = 5, colour = "white"),
-      # reglage de la legende du titre de de x (designe par name)
       axis.text.y = ggplot2::element_text(size = 10),
       axis.title.y = ggplot2::element_text(size = 10),
       legend.title = ggplot2::element_text(colour = "white"),
-      # reglage du titre de la legende
-      # plot.title=element_text(size=14,face="bold"),
-      strip.background = ggplot2::element_rect(fill = "#ECD7A2"),
+      strip.background = ggplot2::element_rect(fill = unname(df_palettecouleur$pal_3col_2[1])),
       legend.background = ggplot2::element_rect(fill = "transparent"),
       legend.key = ggplot2::element_rect(
         fill = "transparent",
         color = "transparent"
       ),
+      legend.position = "inside",
       legend.position.inside = c(1.0, 0.6),
       legend.justification.inside = c(1.2, 0)
     ) +

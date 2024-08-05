@@ -1,9 +1,14 @@
 #' fn11_evol1an_type_lgt_bonus2
 #'
-#' Analyse evolution sur un an pour tous les logements
+#' Une fois l analyse realisee via run all chunk
+#' la fonction permet de creer si besoin un graphe interactif
+#' pour aider a la redaction. Analyse sur 12 mois.
 #'
 #' @param x caractere aut ou com
 #'
+#' @importFrom attempt stop_if
+#' @importFrom cli bg_red
+#' @importFrom cli col_yellow
 #' @importFrom dplyr filter
 #' @importFrom dplyr left_join
 #' @importFrom dplyr mutate
@@ -27,11 +32,15 @@
 #' @export
 #'
 fn11_evol1an_type_lgt_bonus2 <- function(x = "aut") {
+
+  attempt::stop_if(.x = x, .p = ~ !is.character(.x), msg = cli::bg_red(cli::col_yellow("x doit etre au format caractere")))
+  attempt::stop_if(.x = x, .p = ~ !.x %in% c("aut", "com"), msg = cli::bg_red(cli::col_yellow("aut ou com uniquement")))
+
   tab3d <- bilan |>
     dplyr::filter(variable %in% "log", type %in% x) |>
     dplyr::left_join(df_codelgt, by = "variable") |>
     dplyr::select(dplyr::one_of(c(
-      "type", "territoire",
+      "type", "geo", "territoire",
       "libelle", "trim", "trim_b"
     ))) |>
     tidyr::pivot_longer(
@@ -44,10 +53,14 @@ fn11_evol1an_type_lgt_bonus2 <- function(x = "aut") {
     dplyr::mutate(
       diff = round(trim - trim_b,1),
       taux = 100 * round(diff / trim_b, 3),
-      evolution = ifelse(test = taux > 0, "hausse", "baisse")
+      evolution = ifelse(test = taux > 0, "hausse", "baisse"),
+      taux = dplyr::case_when(indicateur == "nombre"~taux,
+                              TRUE~NA),
+      trim = round(trim, 1),
+      trim_b = round(trim_b, 1)
     )
 
-  ggplot2::ggplot(tab3d |> dplyr::filter(!territoire %in% "France m\u00e9tro.")) +
+  ggplot2::ggplot(tab3d|> dplyr::filter(geo >= 2)) +
     ggplot2::geom_segment(ggplot2::aes(
       x = territoire,
       xend = territoire,
@@ -62,10 +75,10 @@ fn11_evol1an_type_lgt_bonus2 <- function(x = "aut") {
     ggplot2::theme_minimal() +
     ggplot2::theme(legend.position = "none") +
     ggplot2::labs(
-      title = "Evolution sur un an",
+      title = "Tous logements - Evolution sur un an",
       subtitle = "12 mois cumul\u00e9s au dernier trimestre / 12 mois un an avant",
-      x = "Type de logement",
-      y = "Nombre et part du nombre de logements",
+      x = "Territoire",
+      y = "Nombre de logements",
       caption = "Dernier trimestre point rouge, trimestre pr\u00e9c\u00e9dent point vert\n Attention pour chaque trimestre cumul sur 12 mois"
     ) -> p
 

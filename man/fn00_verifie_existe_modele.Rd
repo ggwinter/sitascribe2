@@ -13,5 +13,5 @@ fn00_verifie_existe_modele(x = params)
 chemin vers le modele
 }
 \description{
-fn00_verifie_existe_modele
+Verifie que si modele_plaquette est oui le fichier sla est bien dans 3_tables
 }

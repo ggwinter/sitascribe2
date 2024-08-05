@@ -10,8 +10,10 @@ fn11_evol1an_type_lgt_bonus1(x = "aut")
 \item{x}{caractere aut ou com}
 }
 \value{
-liste
+liste des graphiques et tableaux pour les logements autorises et commences
 }
 \description{
-Analyse evolution sur un an par type de logement
+Une fois l analyse realisee via run all chunk
+la fonction permet de creer si besoin un graphe interactif
+pour aider a la redaction.
 }

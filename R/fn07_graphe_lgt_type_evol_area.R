@@ -1,9 +1,12 @@
 #' fn07_graphe_lgt_type_evol_area
 #'
-#' Affiche un graphe surfacique
+#' Une fois l analyse realisee via run all chunk
+#' la fonction permet de creer, si besoin, un graphe
+#' surfacique a la place des courbes.
 #'
 #' @param x character aut ou com
 #'
+#' @importFrom attempt stop_if
 #' @importFrom dplyr filter
 #' @importFrom dplyr group_by
 #' @importFrom dplyr if_else
@@ -32,11 +35,16 @@
 #' @importFrom scales label_number
 #' @importFrom tidyr pivot_longer
 #'
-#' @return graphe
+#' @return graphe surfacique evolution par type pour la Corse
 #' @export
 #'
 fn07_graphe_lgt_type_evol_area <- function(x = "aut") {
-
+  attempt::stop_if(.x = x,
+                   .p = ~!is.character(.x),
+                   msg = cli::bg_red(cli::col_yellow("x doit etre au format caractere")))
+  attempt::stop_if(.x = x,
+                   .p = ~!.x %in% c("aut", "com"),
+                   msg = cli::bg_red(cli::col_yellow("aut ou com uniquement")))
   lsm_12m0$NEW_REG |>
     dplyr::filter(terr_cd %in% "94") |>
     dplyr::filter(complete.cases(log), type %in% x) |>
