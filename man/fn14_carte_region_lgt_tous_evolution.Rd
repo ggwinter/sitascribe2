@@ -13,5 +13,5 @@ fn14_carte_region_lgt_tous_evolution(x = "aut")
 graphique
 }
 \description{
-fn14_carte_region_lgt_tous_evolution
+Carte evolution pour les regions metropolitaines
 }

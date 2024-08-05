@@ -13,5 +13,5 @@ fn10_tableau_lgt_type(x = "toto")
 dataframe
 }
 \description{
-fn10_tableau_lgt_type
+Creation des tableaux au format texte pour la plaquette
 }

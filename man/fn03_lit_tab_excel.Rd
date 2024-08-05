@@ -13,5 +13,5 @@ fn03_lit_tab_excel(x = params$annee_mois)
 liste
 }
 \description{
-fn03_lit_tab_excel
+Lit le tableau excel du SDES
 }

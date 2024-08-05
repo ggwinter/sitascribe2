@@ -13,5 +13,5 @@ fn09_tableau_lgt_tous_territoire(x = "aut")
 dataframe
 }
 \description{
-fn09_tableau_lgt_tous_territoire
+Creation des tableaux au format texte pour la plaquette
 }

@@ -13,5 +13,5 @@ fn07_graphe_lgt_type_evol(x = "aut")
 graphe
 }
 \description{
-Graphique par types de logements autorises page 2, commences  non publie
+Graphique par types de logements autorises page 2, le graphe des logements commences est non publie
 }

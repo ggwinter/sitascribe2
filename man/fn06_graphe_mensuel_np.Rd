@@ -13,5 +13,5 @@ fn06_graphe_mensuel_np(x = "aut")
 graphe
 }
 \description{
-fn06_graphe_mensuel_np
+Affichage du graphe des logements autorises par mois
 }

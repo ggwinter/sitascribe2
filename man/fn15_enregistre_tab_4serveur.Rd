@@ -13,5 +13,5 @@ fn15_enregistre_tab_4serveur(x = "aut")
 nothing
 }
 \description{
-fn15_enregistre_tab_4serveur
+Enregistrement du tableau pour saisie dans l'outil indicateur
 }

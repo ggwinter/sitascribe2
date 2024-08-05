@@ -13,5 +13,5 @@ fn05_modifie2_liste(data = lsm_12m0)
 liste
 }
 \description{
-modifie liste valeurs moyennes en liste valeurs moyennes arrondies.
+Modifie la liste des valeurs cumulees sur 12 mois en liste des valeurs cumulees sur 12 mois arrondies.
 }
