@@ -1,5 +1,7 @@
 #' fn10_tableau_lgt_type
 #'
+#' Creation des tableaux au format texte pour la plaquette
+#'
 #' @param x caractere aut ou com
 #'
 #' @return dataframe

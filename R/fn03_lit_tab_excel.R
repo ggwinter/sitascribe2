@@ -1,5 +1,7 @@
 #' fn03_lit_tab_excel
 #'
+#' Lit le tableau excel du SDES
+#'
 #' @param x vecteur caractere path to file
 #' @importFrom attempt stop_if
 #' @importFrom cli bg_red

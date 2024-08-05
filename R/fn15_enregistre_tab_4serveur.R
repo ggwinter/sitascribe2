@@ -1,5 +1,7 @@
 #' fn15_enregistre_tab_4serveur
 #'
+#' Enregistrement du tableau pour saisie dans l'outil indicateur
+#'
 #' @param x caractere aut ou com
 #'
 #' @return nothing

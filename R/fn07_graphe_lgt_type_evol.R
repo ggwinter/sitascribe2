@@ -1,6 +1,6 @@
 #' fn07_graphe_lgt_type_evol
 #'
-#' Graphique par types de logements autorises page 2, commences  non publie
+#' Graphique par types de logements autorises page 2, le graphe des logements commences est non publie
 #'
 #' @param x caractere aut ou com
 #'

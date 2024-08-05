@@ -1,11 +1,11 @@
 ---
 title: "Plaquette Sitadel"
 author: "G.Winterstein"
-date: "2023-08-11"
+date: "2024-08-05"
 params: 
   annee_mois: "202403"
   modele_plaquette: "oui"
-  modele_nom: "SITADEL_Version_2024_03.sla"
+  modele_nom: "SITADEL_Scr158_Version_2024_04.sla"
 output: html_document
 ---
 
@@ -22,15 +22,11 @@ type_lgt <- c("Autorisés" = "aut", "Commencés" = "com")
 params
 ```
 
-## Choix du modele de plaquette si choix_plaquette : "oui"
+## Choix du modèle de plaquette si choix_plaquette : "oui"
 
 Avant de relancer le script, depuis Scribus ou l'explorateur de fichier : enregistrer une plaquette modifiée à la main dans 3_tables en la nommant comme vous voulez.
 
 **ATTENTION : Pour que cela fonctionne, il faut créer la plaquette modèle à partir d'un fichier sla du répertoire résultats dans le même répertoire ex 202403 en créant une copie, la renommer autrement, sinon vous perdez tous les liens vers les images de la plaquette.**
-
-Où placer les nouvelles images en cas de remplacement :
-
-Comme les images, hors graphiques et cartes, s'affichent dans **toutes les plaquettes**, elles se trouvent dans **construction_neuve/4_resultats/00_logo** : logos, QR Code, dessin grue, photo d'illustration. Enregistrer l'image à la place de l'ancienne avec le même nom (en ayant sauvegardé ailleurs les anciennes images en cas de pb). Dans le cas d'une nouvelle image lui donner un nom compréhensible.
 
 ```{r modele_scribus}
 fn00_verifie_existe_modele()-> nom_modele
@@ -39,15 +35,15 @@ fn00_verifie_existe_modele()-> nom_modele
 
 ## Entrees (data)
 
-### Creer les repertoires et sous-repertoires
+### Créer les répertoires et sous-répertoires
 
 ```{r repertoires}
 fn01_cree_repertoires()
 ```
 
-### Verifie si le mois est valide
+### Verifier si le mois est valide
 
-Le mois dans params (parametres) doit correspondre avec un tableau du ROeS dans 2_data
+Le mois dans params (paramètres) doit correspondre avec un tableau du ROeS dans 2_data
 
 ```{r test_date}
 fn02_verifie_mois_valide() -> ls_dates
@@ -84,56 +80,141 @@ purrr::map(type_lgt, ~fn06_graphe_mensuel_np(.x)) -> ls_graph
 ls_graph
 ```
 
-### Graphique évolution par type pour tous les logements
+### Graphique évolution par type pour tous les logements {.tabset}
 
 ```{r graph1}
 purrr::map(type_lgt, ~fn07_graphe_lgt_type_evol(.x)) -> ls_graph1
-ls_graph1
+
 ```
 
+#### Logements autorisés
+
+```{r graph1_aut, echo=FALSE}
+ls_graph1$Autorisés
+```
+
+#### Logements commencés
+
+```{r graph1_com, echo=FALSE}
+ls_graph1$Commencés
+```
+
+####  {.unnumbered}
 
 ### Tableau Bilan (doc travail)
+
+-   value : valeur arrondie dernier trimestre (cumulé 12 mois)
+
+-   trim : valeur dernier trimestre (cumulé 12 mois)
+
+-   trim_b : valeur un an avant trim
+
+-   evol_trim : taux d'évolution en nombre, pourcentage multiplier par 100
+
+-   trim1 : valeur avant-dernier trimestre (cumulé 12 mois)
+
+-   trim1_b : valeur un an avant trim1
+
+-   trim2 : valeur avant-avant-dernier trimestre (cumulé 12 mois)
+
+-   trim2_b : valeur un an avant trim2
 
 ```{r tab_travail}
 fn08_tableau_bilan() -> bilan
 ```
 
-### Tableau plaquette 1
+### Tableau plaquette 1 {.tabset}
 
-```{r tab1}
+```{r tab1, echo=FALSE}
 purrr::map(type_lgt, ~fn09_tableau_lgt_tous_territoire(.x)) -> ls_tab1
-ls_tab1
+
 ```
 
-### Tableaux plaquette 2
+#### Logements autorisés
+
+```{r tab1_aut, echo=FALSE}
+ls_tab1$Autorisés
+```
+
+#### Logements commencés
+
+```{r tab1_com, echo=FALSE}
+ls_tab1$Commencés
+```
+
+####  {.unnumbered}
+
+### Tableaux plaquette 2 {.tabset}
 
 ```{r tab2}
 purrr::map(type_lgt, ~fn10_tableau_lgt_type(.x)) -> ls_tab2
-ls_tab2
+
 ```
 
-### Graphique part de chaque type de logements
+#### Logements autorisés
 
-```{r graph2}
+```{r tab2_aut, echo=FALSE}
+ls_tab2$Autorisés
+```
+
+#### Logements commencés
+
+```{r tab2_com, echo=FALSE}
+ls_tab2$Commencés
+```
+
+####  {.unnumbered}
+
+### Graphique part de chaque type de logements {.tabset}
+
+```{r graph2, echo=FALSE}
 purrr::map(type_lgt, ~fn11_graphe_barres_lgt_type_territoire(.x)) -> ls_graph2
-ls_graph2
+
 ```
 
-### Graphique comparaison en base 100 Corse et France metropolitaine
+#### Logements autorisés
 
-```{r graph3}
+```{r graph2_aut, echo=FALSE}
+ls_graph2$Autorisés
+```
+
+#### Logements commencés
+
+```{r graph2_com, echo=FALSE}
+ls_graph2$Commencés
+```
+
+####  {.unnumbered}
+
+### Graphique comparaison en base 100 Corse et France metropolitaine {.tabset}
+
+```{r graph3, echo=FALSE}
 purrr::map(type_lgt, ~fn12_graphe_lgt_tous_base100(.x)) -> ls_graph3
-ls_graph3
+
 ```
+
+#### Logements autorisés
+
+```{r graph3_aut, echo=FALSE}
+ls_graph3$Autorisés
+```
+
+#### Logements commencés
+
+```{r graph3_com, echo=FALSE}
+ls_graph3$Commencés
+```
+
+####  {.unnumbered}
 
 ### Graphique comparaison des deux departements corses
 
-```{r graph4}
+```{r graph4, echo=FALSE}
 fn13_graphe_lgt_tous_autcom_dep()-> graph4
 graph4
 ```
 
-### Cartographie{.tabset}
+### Cartographie {.tabset}
 
 ```{r carto, echo=FALSE}
 purrr::map(type_lgt, ~fn14_carte_region_lgt_tous_evolution(.x)) -> ls_carte1
@@ -145,14 +226,13 @@ purrr::map(type_lgt, ~fn14_carte_region_lgt_tous_evolution(.x)) -> ls_carte1
 ls_carte1$Autorisés
 ```
 
-
 #### Logements commencés
 
 ```{r carto_com, echo=FALSE}
 ls_carte1$Commencés
 ```
 
-#### {-}
+####  {.unnumbered}
 
 ### Export data pour serveur
 
@@ -174,7 +254,7 @@ ls_tab <- list("tab1" = ls_tab1[[1]],
 
 ## La plaquette
 
-### lit le modele de plaquette
+### Lit le modele de plaquette
 
 ```{r lit_modele}
 fn16_lit_le_modele_sla() -> ls_modele
@@ -190,3 +270,9 @@ fn20_actualise_date_titre(x = params$annee_mois)
 fn21_tableaux_met_en_forme_2ndeligne()
 
 ```
+
+## Important
+
+**Avant d'ouvrir la plaquette dans Scribus, vérifier que tous les utilisateurs possèdent la même version**. Une version précédente ne pourra pas ouvrir le document s'il a été enregistré avec une version supérieure. (Idem Quantum Gis)
+
+Le modèle de plaquette livré a été réalisé avec la version 1.5.8.

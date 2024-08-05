@@ -1,5 +1,7 @@
 #' fn09_tableau_lgt_tous_territoire
 #'
+#' Creation des tableaux au format texte pour la plaquette
+#'
 #' @param x caractere aut ou com
 #'
 #' @return dataframe

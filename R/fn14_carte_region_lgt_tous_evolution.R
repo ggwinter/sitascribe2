@@ -1,5 +1,7 @@
 #' fn14_carte_region_lgt_tous_evolution
 #'
+#' Carte evolution pour les regions metropolitaines
+#'
 #' @param x caractere aut ou com
 #'
 #' @return graphique

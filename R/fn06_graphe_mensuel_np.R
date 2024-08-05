@@ -1,5 +1,7 @@
 #' fn06_graphe_mensuel_np
 #'
+#' Affichage du graphe des logements autorises par mois
+#'
 #' @param x charactere aut ou com
 #'
 #' @return graphe

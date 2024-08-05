@@ -1,6 +1,6 @@
 #' fn04_modifie1_liste
 #'
-#' modifie liste valeurs en liste valeurs moyennes non arrondies.
+#' Modifie la liste de valeurs en liste de valeurs moyennes non arrondies.
 #'
 #' @param data liste
 #'
