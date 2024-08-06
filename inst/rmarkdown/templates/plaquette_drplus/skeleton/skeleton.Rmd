@@ -4,8 +4,8 @@ author: "G.Winterstein"
 date: "2024-08-05"
 params: 
   annee_mois: "202403"
-  modele_plaquette: "oui"
-  modele_nom: "SITADEL_Scr158_Version_2024_04.sla"
+  modele_plaquette: "non"
+  modele_nom: ""
 output: html_document
 ---
 
@@ -186,6 +186,7 @@ ls_graph2$Commencés
 
 ####  {.unnumbered}
 
+
 ### Graphique comparaison en base 100 Corse et France metropolitaine {.tabset}
 
 ```{r graph3, echo=FALSE}
@@ -206,6 +207,7 @@ ls_graph3$Commencés
 ```
 
 ####  {.unnumbered}
+
 
 ### Graphique comparaison des deux departements corses
 

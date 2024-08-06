@@ -42,6 +42,6 @@ fn00_verifie_existe_modele <- function(x = params) {
     }
 
     stopifnot(test == "ok")
-  }
+  }else{ nom_modele <- ""}
   return(nom_modele)
 }
