@@ -132,8 +132,8 @@ fn12_graphe_lgt_tous_base100 <- function(x = "aut") {
       legend.key = ggplot2::element_rect(fill = "transparent",
                                          color = "transparent"),
       legend.position = "inside",
-      legend.position.inside = c(0.25, 0),
-      legend.justification.inside = c(1.2, 0)
+      legend.position.inside = c(0.1, 0.7)
+      #,legend.justification.inside = c(1.2, 0)
     ) +
     ggplot2::guides(
       colour = ggplot2::guide_legend(title = NULL),
